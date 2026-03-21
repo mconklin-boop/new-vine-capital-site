@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
-import SiteHeader from "../components/SiteHeader";
-import SiteFooter from "../components/SiteFooter";
+import SiteHeader from "../../components/SiteHeader";
+import SiteFooter from "../../components/SiteFooter";
 
 export default function FuelCards() {
   useEffect(() => {
