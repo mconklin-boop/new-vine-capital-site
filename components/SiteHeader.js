@@ -1,51 +1,33 @@
 import Image from "next/image";
-import Link from "next/link";
 
-export default function SiteHeader() {
+export default function SiteFooter() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#8c6a2d]/20 bg-[#050505]/90 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            alt="New Vine Capital logo"
-            width={42}
-            height={42}
-            className="h-10 w-10 object-contain"
-            priority
-          />
-          <span className="text-lg font-semibold text-[#f4ead2]">
-            New Vine Capital
-          </span>
-        </Link>
+    <footer className="border-t border-[#8c6a2d]/15 bg-[#050505]">
+      <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="New Vine Capital logo"
+              width={42}
+              height={42}
+              className="h-10 w-10 object-contain"
+            />
+            <div>
+              <div className="text-sm font-semibold tracking-[0.18em] text-[#d7bb74]">
+                NEW VINE CAPITAL
+              </div>
+              <div className="text-xs text-[#9f9a89]">
+                Private Lending • Strategic Capital
+              </div>
+            </div>
+          </div>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-[#c5bea9] md:flex">
-          <Link href="/" className="transition hover:text-[#d7bb74]">
-            Home
-          </Link>
-          <Link
-            href="/real-estate-funding"
-            className="transition hover:text-[#d7bb74]"
-          >
-            Real Estate Funding
-          </Link>
-          <Link
-            href="/business-financing"
-            className="transition hover:text-[#d7bb74]"
-          >
-            Business Financing
-          </Link>
-        </nav>
-
-        <div className="hidden items-center gap-4 md:flex">
-          <a
-            href="tel:7208174277"
-            className="rounded-xl border border-[#8c6a2d]/30 px-4 py-2 text-sm text-[#f4ead2] transition hover:bg-[#172015]"
-          >
-            Call Now
-          </a>
+          <div className="text-sm text-[#9f9a89]">
+            deals@newvinecapital.com • 720-817-4277 • 1500 N Grant St #7339 Denver, CO 80203
+          </div>
         </div>
       </div>
-    </header>
+    </footer>
   );
 }
