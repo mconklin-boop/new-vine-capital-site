@@ -24,31 +24,19 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden gap-8 text-sm text-[#d8cfb6] md:flex">
-          <Link href="/" className="transition hover:text-[#d7bb74]">
+          <Link href="/" className="hover:text-[#d7bb74]">
             Home
           </Link>
-          <Link
-            href="/real-estate-funding"
-            className="transition hover:text-[#d7bb74]"
-          >
-            Real Estate Funding
+          <Link href="/real-estate-funding" className="hover:text-[#d7bb74]">
+            Real Estate
           </Link>
-          <Link
-            href="/business-financing"
-            className="transition hover:text-[#d7bb74]"
-          >
+          <Link href="/business-financing" className="hover:text-[#d7bb74]">
             Business Financing
           </Link>
-          <Link
-            href="/fuel-cards"
-            className="transition hover:text-[#d7bb74]"
-          >
+          <Link href="/fuel-cards" className="hover:text-[#d7bb74]">
             Fuel Accounts
           </Link>
-          <Link
-            href="/submit-deal"
-            className="transition hover:text-[#d7bb74]"
-          >
+          <Link href="/submit-deal" className="hover:text-[#d7bb74]">
             Submit Deal
           </Link>
         </nav>
