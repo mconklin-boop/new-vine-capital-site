@@ -9,7 +9,7 @@ export default function Home() {
         "For real estate opportunities, acquisition scenarios, bridge requests, refinance transactions, and investor-focused funding needs.",
       icon: "🏠",
       cta: "Submit Deal",
-      href: "/submit-deal",
+      href: "/real-estate-funding"
     },
     {
       title: "Apply for Business Lending",
