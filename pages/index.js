@@ -17,7 +17,7 @@ export default function Home() {
         "For fuel cards, equipment leasing, vehicle financing, working capital, and other business-purpose lending solutions.",
       icon: "📄",
       cta: "Apply Now",
-      href: "/apply-now",
+      href: "/business-financing"
     },
     {
       title: "Private Capital Solutions",
