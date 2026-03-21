@@ -4,26 +4,26 @@ import Link from "next/link";
 export default function Home() {
   const services = [
     {
-      title: "Submit a New Deal",
+      title: "Real Estate Funding",
       description:
-        "For real estate opportunities, acquisition scenarios, bridge requests, refinance transactions, and investor-focused funding needs.",
+        "Flexible capital solutions for DSCR, Fix & Flip, Bridge, EMD, Transactional funding, and other investor-focused real estate opportunities.",
       icon: "🏠",
-      cta: "Submit Deal",
-      href: "/real-estate-funding"
+      cta: "View Real Estate Funding",
+      href: "/real-estate-funding",
     },
     {
-      title: "Apply for Business Lending",
+      title: "Business Financing Solutions",
       description:
-        "For fuel cards, equipment leasing, vehicle financing, working capital, and other business-purpose lending solutions.",
-      icon: "📄",
-      cta: "Apply Now",
-      href: "/business-financing"
-    },
-    {
-      title: "Private Capital Solutions",
-      description:
-        "Custom structured financing for borrowers who need direct communication, practical terms, and efficient execution.",
+        "Funding solutions for fuel accounts, business lines of credit, equipment leasing, and other business-purpose capital needs.",
       icon: "💼",
+      cta: "View Business Financing",
+      href: "/business-financing",
+    },
+    {
+      title: "Direct, Relationship-Driven Capital",
+      description:
+        "Structured financing for borrowers who value speed, clarity, and direct communication throughout the process.",
+      icon: "🤝",
       cta: "Contact Us",
       href: "#contact",
     },
@@ -32,27 +32,27 @@ export default function Home() {
   const steps = [
     {
       step: "01",
-      title: "Choose Your Path",
+      title: "Choose Your Funding Path",
       description:
-        "Submit a real estate deal or apply for business-purpose financing through the correct intake path.",
+        "Select real estate funding or business financing based on your specific opportunity and capital needs.",
     },
     {
       step: "02",
-      title: "Review & Structure",
+      title: "Submit Your Information",
       description:
-        "We assess the numbers, collateral, timeline, and strategy to determine the right structure.",
+        "Provide the details of your deal, product request, or funding need through the appropriate intake path.",
     },
     {
       step: "03",
-      title: "Receive Terms",
+      title: "Review & Structure",
       description:
-        "You get a clear proposal with straightforward expectations, requirements, and next steps.",
+        "We evaluate the opportunity, review the numbers, and determine the right structure.",
     },
     {
       step: "04",
-      title: "Close & Fund",
+      title: "Move Forward",
       description:
-        "Once approved, we move efficiently so you can close, execute, and keep momentum.",
+        "Once approved, we work efficiently so you can execute with confidence and keep momentum.",
     },
   ];
 
@@ -67,20 +67,20 @@ export default function Home() {
 
   const faqs = [
     {
-      q: "What types of deals does New Vine Capital consider?",
-      a: "We focus on real estate transactions, business-purpose vehicle and equipment financing, and select private lending scenarios where speed and flexibility matter.",
+      q: "What types of real estate funding does New Vine Capital offer?",
+      a: "We highlight DSCR loans, Fix & Flip financing, Bridge loans, EMD funding, and Transactional funding for real estate investors and operators.",
+    },
+    {
+      q: "What business financing solutions do you offer?",
+      a: "We currently highlight fuel accounts, business lines of credit, equipment leasing, and additional products that will be added over time.",
+    },
+    {
+      q: "How do I know which path to choose?",
+      a: "If your request is tied to a property or investment opportunity, choose Real Estate Funding. If your request is for a business product like fuel accounts or equipment leasing, choose Business Financing.",
     },
     {
       q: "How quickly can you review a request?",
       a: "Timing depends on complexity and documentation, but our process is designed to be direct and efficient so strong opportunities can move quickly.",
-    },
-    {
-      q: "Do you work with investors and business owners?",
-      a: "Yes. New Vine Capital is built to serve investors, operators, and entrepreneurs who need a funding partner that understands execution, structure, and speed.",
-    },
-    {
-      q: "How do I know whether to submit a deal or apply now?",
-      a: "Use Submit a New Deal for real estate and collateral-based opportunities. Use Apply Now for business lending products like fuel cards, equipment leasing, vehicle financing, and working capital.",
     },
   ];
 
@@ -107,12 +107,12 @@ export default function Home() {
           </Link>
 
           <nav className="hidden gap-8 text-sm text-[#d8cfb6] md:flex">
-            <a href="#services" className="transition hover:text-[#d7bb74]">
-              Services
-            </a>
-            <a href="#process" className="transition hover:text-[#d7bb74]">
-              Process
-            </a>
+            <Link href="/real-estate-funding" className="transition hover:text-[#d7bb74]">
+              Real Estate Funding
+            </Link>
+            <Link href="/business-financing" className="transition hover:text-[#d7bb74]">
+              Business Financing
+            </Link>
             <a href="#about" className="transition hover:text-[#d7bb74]">
               About
             </a>
@@ -133,27 +133,29 @@ export default function Home() {
             <div className="mb-4 inline-flex w-fit rounded-full border border-[#8c6a2d]/40 bg-[#1b160d] px-4 py-2 text-sm text-[#d7bb74]">
               Capital built for execution
             </div>
+
             <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-[#f8f1de] md:text-6xl">
-              Funding solutions built for real opportunities and serious borrowers.
+              Strategic funding solutions for real estate investors and business operators.
             </h1>
+
             <p className="mt-6 max-w-xl text-lg leading-8 text-[#d2c9b3]">
-              New Vine Capital provides flexible, relationship-driven financing for real estate,
-              business assets, and private lending opportunities with clarity, speed, and
-              practical deal structure.
+              New Vine Capital provides flexible, relationship-driven financing for
+              real estate and business opportunities with clarity, speed, and practical
+              deal structure.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/submit-deal"
+                href="/real-estate-funding"
                 className="rounded-2xl bg-[#d7bb74] px-6 py-4 text-center text-sm font-semibold text-[#16120a] shadow-lg shadow-[#d7bb74]/20 transition hover:-translate-y-0.5 hover:bg-[#e5ca86]"
               >
-                Submit a New Deal
+                Real Estate Funding
               </Link>
               <Link
-                href="/apply-now"
+                href="/business-financing"
                 className="rounded-2xl border border-[#8c6a2d]/35 bg-[#0f120d]/80 px-6 py-4 text-center text-sm font-semibold text-[#f4ead2] transition hover:bg-[#172015]"
               >
-                Apply Now
+                Business Financing
               </Link>
             </div>
 
@@ -200,7 +202,7 @@ export default function Home() {
                   <div className="rounded-2xl border border-[#8c6a2d]/20 bg-[#0f120d] p-5">
                     <div className="text-sm text-[#9ba082]">Primary Focus</div>
                     <div className="mt-2 text-lg font-medium text-[#f4ead2]">
-                      Real Estate, Business Assets, Vehicles, Equipment, and Special Opportunity Lending
+                      Real Estate Funding and Business Financing Solutions
                     </div>
                   </div>
 
@@ -220,8 +222,8 @@ export default function Home() {
                   </div>
 
                   <div className="rounded-2xl border border-[#8c6a2d]/25 bg-[#1a2117] p-5 text-[#efe5cf]">
-                    New Vine Capital is positioned as a professional funding partner for borrowers
-                    who value speed, structure, and direct communication.
+                    New Vine Capital is positioned as a professional funding partner
+                    for borrowers who value speed, structure, and direct communication.
                   </div>
                 </div>
               </div>
@@ -234,11 +236,11 @@ export default function Home() {
         <div className="max-w-2xl">
           <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">Services</div>
           <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de] md:text-4xl">
-            Capital solutions designed to move deals forward.
+            Capital solutions designed to move opportunities forward.
           </h2>
           <p className="mt-4 text-[#c5bea9]">
-            We work with opportunities that require more than a generic lending process. Our focus
-            is responsiveness, structure, and fit.
+            We work with opportunities that require more than a generic lending
+            process. Our focus is responsiveness, structure, and fit.
           </p>
         </div>
 
@@ -295,15 +297,17 @@ export default function Home() {
               A values-driven capital company with a practical business mindset.
             </h2>
             <p className="mt-6 max-w-3xl leading-8 text-[#c5bea9]">
-              New Vine Capital is a Colorado-based financing company built around relationship
-              capital, disciplined underwriting, and direct communication. We believe capital
-              should help strong opportunities move, not slow them down with unnecessary friction.
+              New Vine Capital is a Colorado-based financing company built around
+              relationship capital, disciplined underwriting, and direct
+              communication. We believe capital should help strong opportunities
+              move, not slow them down with unnecessary friction.
             </p>
             <p className="mt-4 max-w-3xl leading-8 text-[#c5bea9]">
-              Our approach is simple: understand the opportunity, structure the deal clearly, and
-              operate with integrity from first contact to closing. Whether the need is tied to real
-              estate, business assets, or private lending, we aim to provide a professional and
-              dependable experience.
+              Our approach is simple: understand the opportunity, structure the
+              deal clearly, and operate with integrity from first contact to
+              closing. Whether the need is tied to real estate or business
+              financing, we aim to provide a professional and dependable
+              experience.
             </p>
           </div>
 
@@ -349,10 +353,12 @@ export default function Home() {
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#0d0d0b] p-8">
             <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">Contact</div>
-            <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">Let’s talk about your deal.</h2>
+            <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">
+              Let’s talk about your funding needs.
+            </h2>
             <p className="mt-4 leading-8 text-[#c5bea9]">
-              Use this site as the front door for deal submissions, borrower inquiries, and
-              investor conversations.
+              Use this site as the front door for real estate opportunities,
+              borrower inquiries, and business financing requests.
             </p>
 
             <div className="mt-8 space-y-5 text-[#f0e6cf]">
@@ -386,32 +392,38 @@ export default function Home() {
           </div>
 
           <div className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#10100d] p-8 shadow-2xl shadow-black/20">
-            <h3 className="text-2xl font-semibold text-[#f8f1de]">Choose Your Starting Point</h3>
+            <h3 className="text-2xl font-semibold text-[#f8f1de]">
+              Choose Your Starting Point
+            </h3>
             <p className="mt-3 text-[#c5bea9]">
-              Select the path that fits your request. Real estate opportunities go through deal
-              submission. Other lending products begin with an application.
+              Select the path that best fits your request. Real estate opportunities
+              and business financing needs each have their own dedicated flow.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <Link
-                href="/submit-deal"
+                href="/real-estate-funding"
                 className="rounded-2xl border border-[#8c6a2d]/25 bg-[#1a2117] p-5 transition hover:bg-[#232d1f]"
               >
-                <div className="text-lg font-semibold text-[#f4ead2]">Submit a New Deal</div>
+                <div className="text-lg font-semibold text-[#f4ead2]">
+                  Real Estate Funding
+                </div>
                 <div className="mt-2 text-sm leading-6 text-[#c5bea9]">
-                  Real estate deals, acquisitions, refinance scenarios, bridge requests, and
-                  collateral-based opportunities.
+                  DSCR, Fix & Flip, Bridge, EMD, Transactional funding, and other
+                  investor-focused opportunities.
                 </div>
               </Link>
 
               <Link
-                href="/apply-now"
+                href="/business-financing"
                 className="rounded-2xl border border-[#8c6a2d]/25 bg-[#0a0a08] p-5 transition hover:bg-[#141411]"
               >
-                <div className="text-lg font-semibold text-[#f4ead2]">Apply Now</div>
+                <div className="text-lg font-semibold text-[#f4ead2]">
+                  Business Financing
+                </div>
                 <div className="mt-2 text-sm leading-6 text-[#c5bea9]">
-                  Fuel cards, equipment leasing, vehicle financing, working capital, and other
-                  business lending solutions.
+                  Fuel accounts, business lines of credit, equipment leasing, and
+                  other business-purpose lending solutions.
                 </div>
               </Link>
             </div>
