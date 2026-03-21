@@ -26,6 +26,13 @@ export default function BusinessFinancing() {
       cta: "Contact Us",
     },
     {
+      title: "Credit Stacking",
+      description:
+        "Access multiple unsecured business credit lines using a strategic stacking approach. Designed to help business owners secure significant capital without collateral.",
+      href: "/business-financing/credit-stacking",
+      cta: "Explore Credit Stacking",
+    },
+    {
       title: "More Products Coming",
       description:
         "New Vine Capital is actively expanding its business financing solutions to better serve business owners, operators, and growing companies.",
@@ -88,7 +95,7 @@ export default function BusinessFinancing() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <div
               key={product.title}
@@ -155,8 +162,9 @@ export default function BusinessFinancing() {
                 Ask about other business financing solutions.
               </h2>
               <p className="mt-4 leading-8 text-[#c5bea9]">
-                For business lines of credit, equipment leasing, and upcoming products,
-                contact New Vine Capital directly to discuss your funding needs.
+                For business lines of credit, equipment leasing, credit stacking,
+                and upcoming products, contact New Vine Capital directly to discuss
+                your funding needs.
               </p>
 
               <div className="mt-8 space-y-4 text-[#c5bea9]">
@@ -187,8 +195,8 @@ export default function BusinessFinancing() {
             Ready to get started?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl leading-8 text-[#c5bea9]">
-            Explore our featured Fuel Account application or contact New Vine Capital
-            to discuss other business financing opportunities.
+            Explore our featured Fuel Account application, review Credit Stacking,
+            or contact New Vine Capital to discuss other business financing opportunities.
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
@@ -199,10 +207,10 @@ export default function BusinessFinancing() {
               Explore Fuel Accounts
             </Link>
             <Link
-              href="/real-estate-funding"
+              href="/business-financing/credit-stacking"
               className="rounded-2xl border border-[#8c6a2d]/35 bg-[#0f120d]/80 px-8 py-4 text-sm font-semibold text-[#f4ead2] transition hover:bg-[#172015]"
             >
-              View Real Estate Funding
+              Explore Credit Stacking
             </Link>
           </div>
         </div>
