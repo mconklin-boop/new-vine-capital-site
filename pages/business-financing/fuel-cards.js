@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 
 export default function FuelCards() {
   useEffect(() => {
@@ -12,45 +13,7 @@ export default function FuelCards() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#f4ead2]">
-      <header className="border-b border-[#8c6a2d]/25 bg-[#050505]/90">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="New Vine Capital logo"
-              width={56}
-              height={56}
-              className="h-14 w-14 object-contain"
-            />
-            <div>
-              <div className="text-xl font-semibold tracking-[0.18em] text-[#d7bb74]">
-                NEW VINE CAPITAL
-              </div>
-              <div className="text-xs uppercase tracking-[0.35em] text-[#9ba082]">
-                Private Lending • Strategic Capital
-              </div>
-            </div>
-          </Link>
-
-          <div className="hidden gap-8 text-sm text-[#d8cfb6] md:flex">
-            <Link href="/" className="transition hover:text-[#d7bb74]">
-              Home
-            </Link>
-            <Link
-              href="/business-financing"
-              className="transition hover:text-[#d7bb74]"
-            >
-              Business Financing
-            </Link>
-            <Link
-              href="/real-estate-funding"
-              className="transition hover:text-[#d7bb74]"
-            >
-              Real Estate Funding
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(215,187,116,0.15),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(83,101,68,0.15),transparent_30%)]" />
@@ -169,34 +132,7 @@ export default function FuelCards() {
         </div>
       </section>
 
-      <footer className="border-t border-[#8c6a2d]/15 bg-[#050505]">
-        <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/logo.png"
-                alt="New Vine Capital logo"
-                width={42}
-                height={42}
-                className="h-10 w-10 object-contain"
-              />
-              <div>
-                <div className="text-sm font-semibold tracking-[0.18em] text-[#d7bb74]">
-                  NEW VINE CAPITAL
-                </div>
-                <div className="text-xs text-[#9f9a89]">
-                  Private Lending • Strategic Capital
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-[#9f9a89]">
-              deals@newvinecapital.com • 720-817-4277 • 1500 N Grant St #7339
-              Denver, CO 80203
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
