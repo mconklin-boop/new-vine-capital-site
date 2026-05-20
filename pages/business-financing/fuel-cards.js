@@ -78,13 +78,13 @@ export default function FuelCards() {
 
           <div className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#10100d] p-8 shadow-2xl shadow-black/20">
             <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">
-              Apply Now
+              Submit Deal
             </div>
             <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">
-              Start your fuel account application
+              Start your fuel account review
             </h2>
             <p className="mt-4 leading-8 text-[#c5bea9]">
-              Complete the application below and New Vine Capital will review your
+              Complete the form below and New Vine Capital will review your
               request and follow up with next steps.
             </p>
 
