@@ -10,6 +10,7 @@ const navItems = [
   { href: "/funding-process", label: "Process" },
   { href: "/investors", label: "Investors" },
   { href: "/contact", label: "Contact" },
+  { href: "/investor-portal", label: "Investor Login" },
 ];
 
 export { JOTFORM_URL };
@@ -24,7 +25,7 @@ export default function SiteHeader() {
           <Image src="/logo.png" alt="New Vine Capital" width={132} height={132} className="h-24 w-24 object-contain md:h-28 md:w-28" priority />
         </Link>
 
-        <nav className="hidden items-center gap-7 text-xs font-black uppercase tracking-wide text-white/70 lg:flex">
+        <nav className="hidden items-center gap-5 text-xs font-black uppercase tracking-wide text-white/70 lg:flex">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="transition hover:text-[#d5ad62]">
               {item.label}
