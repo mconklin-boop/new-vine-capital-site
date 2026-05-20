@@ -29,7 +29,7 @@ export default function Home() {
               </p>
               <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">
-                  Apply Now
+                  Submit Deal
                 </a>
                 <Link href="/contact#schedule" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">
                   Schedule a Call
@@ -107,7 +107,7 @@ export default function Home() {
       </main>
 
       <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="fixed bottom-4 right-4 z-40 bg-[#d5ad62] px-5 py-4 text-xs font-black uppercase text-[#11100b] shadow-2xl shadow-black/40 md:right-6">
-        Apply Now
+        Submit Deal
       </a>
       <SiteFooter />
     </div>
