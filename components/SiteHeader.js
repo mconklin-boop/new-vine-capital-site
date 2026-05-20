@@ -19,9 +19,9 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050605]/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
         <Link href="/" className="flex items-center gap-3" aria-label="New Vine Capital home">
-          <Image src="/logo.png" alt="New Vine Capital" width={64} height={64} className="h-14 w-14 object-contain" priority />
+          <Image src="/logo.png" alt="New Vine Capital" width={92} height={92} className="h-20 w-20 object-contain" priority />
         </Link>
 
         <nav className="hidden items-center gap-7 text-xs font-black uppercase tracking-wide text-white/70 lg:flex">
