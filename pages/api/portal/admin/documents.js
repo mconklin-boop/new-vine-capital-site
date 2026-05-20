@@ -1,6 +1,14 @@
 import { getPortalSession, logPortalEvent } from "../../../../lib/portalAuth";
 import { getSupabaseAdmin } from "../../../../lib/supabaseAdmin";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb",
+    },
+  },
+};
+
 async function requireAdmin(req, res) {
   const user = await getPortalSession(req);
   if (!user || user.role !== "Admin") {
@@ -8,6 +16,10 @@ async function requireAdmin(req, res) {
     return null;
   }
   return user;
+}
+
+function cleanFileName(value) {
+  return String(value || "document.pdf").replace(/[^a-zA-Z0-9._-]/g, "-").slice(-120);
 }
 
 export default async function handler(req, res) {
@@ -23,21 +35,39 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    const { name, category, storage_path, profile_id, role } = req.body || {};
-    if (!name || !category || !storage_path) return res.status(400).json({ error: "Missing document fields" });
+    const { name, category, storage_path, profile_id, role, fileName, contentType, fileBase64 } = req.body || {};
+    if (!name || !category) return res.status(400).json({ error: "Document name and category are required" });
+
+    let finalStoragePath = storage_path;
+
+    if (fileBase64) {
+      const safeName = cleanFileName(fileName);
+      finalStoragePath = `documents/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}-${safeName}`;
+      const buffer = Buffer.from(String(fileBase64).split(",").pop(), "base64");
+      const { error: uploadError } = await supabase.storage
+        .from("portal-documents")
+        .upload(finalStoragePath, buffer, {
+          contentType: contentType || "application/octet-stream",
+          upsert: false,
+        });
+      if (uploadError) return res.status(500).json({ error: uploadError.message });
+    }
+
+    if (!finalStoragePath) return res.status(400).json({ error: "Upload a file or provide a storage path" });
 
     const { data: document, error } = await supabase
       .from("portal_documents")
-      .insert({ name, category, storage_path, uploaded_by: admin.id })
+      .insert({ name, category, storage_path: finalStoragePath, uploaded_by: admin.id })
       .select("*")
       .single();
     if (error) return res.status(500).json({ error: error.message });
 
     if (profile_id || role) {
-      await supabase.from("portal_document_assignments").insert({ document_id: document.id, profile_id: profile_id || null, role: role || null });
+      const { error: assignmentError } = await supabase.from("portal_document_assignments").insert({ document_id: document.id, profile_id: profile_id || null, role: role || null });
+      if (assignmentError) return res.status(500).json({ error: assignmentError.message });
     }
 
-    await logPortalEvent({ type: "admin_document_create", userId: admin.id, email: admin.email, resourceType: "portal_document", resourceId: document.id, metadata: { name, category } });
+    await logPortalEvent({ type: "admin_document_create", userId: admin.id, email: admin.email, resourceType: "portal_document", resourceId: document.id, metadata: { name, category, assignedTo: profile_id || role || "unassigned" } });
     return res.status(201).json({ document });
   }
 
