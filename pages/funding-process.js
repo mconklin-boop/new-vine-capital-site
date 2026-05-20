@@ -5,7 +5,7 @@ const steps = [
   ["Submit Deal", "Send property details, loan request, contract status, borrower background, and timeline."],
   ["Initial Review", "We assess collateral, leverage, exit strategy, and whether the request fits private capital."],
   ["Underwriting", "Valuation, title, entity, borrower, budget, insurance, and exit diligence are coordinated. Credit report fees and appraisal fees may be collected during this stage when required for borrower review and third-party valuation."],
-  ["Approval & Docs", "Terms are finalized, conditions are cleared, and closing documents are prepared."],
+  ["Approval & Docs", "Terms are finalized, conditions are cleared, and closing documents are prepared. Final approvals are completed on Fridays during our investor meeting."],
   ["Funding", "Funds are released when documentation, closing, and lender conditions are complete."],
 ];
 
