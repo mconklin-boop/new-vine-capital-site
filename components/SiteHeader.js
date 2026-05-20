@@ -1,58 +1,61 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+
+const JOTFORM_URL = "https://form.jotform.com/260916045657058";
+
+const navItems = [
+  { href: "/loan-programs", label: "Loan Programs" },
+  { href: "/about", label: "About" },
+  { href: "/funding-process", label: "Process" },
+  { href: "/investors", label: "Investors" },
+  { href: "/contact", label: "Contact" },
+];
+
+export { JOTFORM_URL };
 
 export default function SiteHeader() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#8c6a2d]/20 bg-[#050505]/90 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            alt="New Vine Capital logo"
-            width={42}
-            height={42}
-            className="h-10 w-10 object-contain"
-            priority
-          />
-          <span className="text-lg font-semibold text-[#f4ead2]">
-            New Vine Capital
-          </span>
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050605]/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
+        <Link href="/" className="flex items-center gap-3" aria-label="New Vine Capital home">
+          <Image src="/logo.png" alt="New Vine Capital" width={64} height={64} className="h-14 w-14 object-contain" priority />
         </Link>
 
-        {/* Navigation (ALWAYS visible now) */}
-        <nav className="flex items-center gap-8 text-sm font-medium text-[#c5bea9]">
-          <Link href="/" className="transition hover:text-[#d7bb74]">
-            Home
-          </Link>
-
-          <Link
-            href="/real-estate-funding"
-            className="transition hover:text-[#d7bb74]"
-          >
-            Real Estate Funding
-          </Link>
-
-          <Link
-            href="/business-financing"
-            className="transition hover:text-[#d7bb74]"
-          >
-            Business Financing
-          </Link>
+        <nav className="hidden items-center gap-7 text-xs font-black uppercase tracking-wide text-white/70 lg:flex">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} className="transition hover:text-[#d5ad62]">
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Right CTA */}
-        <div className="flex items-center gap-4">
-          <a
-            href="tel:7208174277"
-            className="rounded-xl border border-[#8c6a2d]/30 px-4 py-2 text-sm text-[#f4ead2] transition hover:bg-[#172015]"
-          >
-            Call Now
-          </a>
-        </div>
+        <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="hidden bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] lg:inline-flex">
+          Apply Now
+        </a>
 
+        <button type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen(!open)} className="grid h-11 w-11 place-items-center border border-white/15 lg:hidden">
+          <span className="grid gap-1.5">
+            <span className="block h-0.5 w-6 bg-white" />
+            <span className="block h-0.5 w-6 bg-white" />
+          </span>
+        </button>
       </div>
+
+      {open && (
+        <nav className="grid gap-1 border-t border-white/10 bg-[#050605] px-5 py-5 text-sm font-black uppercase text-white/80 lg:hidden">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="py-3 transition hover:text-[#d5ad62]">
+              {item.label}
+            </Link>
+          ))}
+          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
+            Apply Now
+          </a>
+        </nav>
+      )}
     </header>
   );
 }
