@@ -17,6 +17,18 @@ export default async function handler(req, res) {
 
   if (error || !document) return res.status(404).json({ error: "Document not found" });
 
+  if (user.role !== "Admin") {
+    const { data: assignment } = await supabase
+      .from("portal_document_assignments")
+      .select("id")
+      .eq("document_id", document.id)
+      .or(`profile_id.eq.${user.id},role.eq.${user.role}`)
+      .limit(1)
+      .maybeSingle();
+
+    if (!assignment) return res.status(403).json({ error: "Document has not been assigned to this investor" });
+  }
+
   const { data: signed, error: signedError } = await supabase.storage
     .from("portal-documents")
     .createSignedUrl(document.storage_path, 60 * 5, { download: action === "download" });
