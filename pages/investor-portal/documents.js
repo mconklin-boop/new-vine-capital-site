@@ -13,11 +13,21 @@ export async function getServerSideProps(context) {
 
   if (canViewOfferingDocuments(user)) {
     const supabase = getSupabaseAdmin();
-    const { data } = await supabase
-      .from("portal_documents")
-      .select("id, name, category, upload_date")
-      .order("upload_date", { ascending: false });
-    documents = data || [];
+
+    if (user.role === "Admin") {
+      const { data } = await supabase.from("portal_documents").select("id, name, category, upload_date").order("upload_date", { ascending: false });
+      documents = data || [];
+    } else {
+      const { data: assignments } = await supabase
+        .from("portal_document_assignments")
+        .select("document_id")
+        .or(`profile_id.eq.${user.id},role.eq.${user.role}`);
+      const ids = [...new Set((assignments || []).map((item) => item.document_id))];
+      if (ids.length) {
+        const { data } = await supabase.from("portal_documents").select("id, name, category, upload_date").in("id", ids).order("upload_date", { ascending: false });
+        documents = data || [];
+      }
+    }
   }
 
   await logPortalEvent({ type: "documents_page_view", userId: user.id, email: user.email, metadata: { role: user.role } });
