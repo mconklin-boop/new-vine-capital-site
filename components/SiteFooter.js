@@ -6,7 +6,7 @@ export default function SiteFooter() {
     <footer className="border-t border-white/10 bg-[#030403] text-white/70">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[1fr_auto] lg:px-8">
         <div className="max-w-xl">
-          <Image src="/logo.png" alt="New Vine Capital" width={76} height={76} className="h-20 w-20 object-contain" />
+          <Image src="/logo.png" alt="New Vine Capital" width={112} height={112} className="h-28 w-28 object-contain" />
           <p className="mt-4 text-sm leading-7">
             Fast Private Capital Solutions for real estate investors, brokers, developers, wholesalers, and business owners.
           </p>
