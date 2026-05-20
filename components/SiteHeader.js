@@ -33,7 +33,7 @@ export default function SiteHeader() {
         </nav>
 
         <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="hidden bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] lg:inline-flex">
-          Apply Now
+          Submit Deal
         </a>
 
         <button type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen(!open)} className="grid h-11 w-11 place-items-center border border-white/15 lg:hidden">
@@ -52,7 +52,7 @@ export default function SiteHeader() {
             </Link>
           ))}
           <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
-            Apply Now
+            Submit Deal
           </a>
         </nav>
       )}
