@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import SiteHeader, { JOTFORM_URL } from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
@@ -20,6 +21,7 @@ export default function Home() {
         <section className="nvc-hero-bg relative grid min-h-[92vh] items-center overflow-hidden px-5 py-24 lg:grid-cols-[1fr_420px] lg:px-8">
           <div className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[1fr_420px]">
             <div className="max-w-4xl self-center">
+              <Image src="/logo.png" alt="New Vine Capital" width={260} height={260} className="mb-8 h-48 w-48 object-contain drop-shadow-2xl md:h-64 md:w-64 lg:h-72 lg:w-72" priority />
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Fast Private Capital Solutions</p>
               <h1 className="mt-5 max-w-5xl font-serif text-5xl leading-none text-white md:text-7xl lg:text-8xl">
                 Private Capital Built for Real Estate Investors
