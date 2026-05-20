@@ -25,6 +25,40 @@ export default async function handler(req, res) {
     return res.status(200).json({ users: data || [] });
   }
 
+  if (req.method === "POST") {
+    const { email, password, name, phone, role = "Pending Investor", status = "Pending Investor", entity_name, investor_type, estimated_range, relationship_source } = req.body || {};
+    if (!email || !password) return res.status(400).json({ error: "Email and temporary password are required" });
+
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name: name || email },
+    });
+    if (authError) return res.status(500).json({ error: authError.message });
+
+    const profile = {
+      id: authData.user.id,
+      email,
+      name: name || email,
+      phone: phone || null,
+      role,
+      status,
+      entity_name: entity_name || null,
+      investor_type: investor_type || "Not specified",
+      estimated_range: estimated_range || "Not specified",
+      relationship_source: relationship_source || "Admin created",
+      onboarding_status: status === "Approved Investor" ? "Approved" : "In review",
+      compliance_review_status: status === "Approved Investor" ? "Approved" : "Pending review",
+    };
+
+    const { data, error } = await supabase.from("portal_profiles").insert(profile).select("*").single();
+    if (error) return res.status(500).json({ error: error.message });
+
+    await logPortalEvent({ type: "admin_user_create", userId: admin.id, email: admin.email, resourceType: "portal_profile", resourceId: data.id, metadata: { email, role, status } });
+    return res.status(201).json({ user: data });
+  }
+
   if (req.method === "PATCH") {
     const { id, role, status, deactivated, onboarding_status, compliance_review_status } = req.body || {};
     if (!id) return res.status(400).json({ error: "Missing user id" });
