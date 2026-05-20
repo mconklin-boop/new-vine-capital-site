@@ -86,6 +86,10 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
     }
     if (payload.assignment_type === "profile") payload.role = "";
     if (payload.assignment_type === "role") payload.profile_id = "";
+    if (payload.assignment_type === "none") {
+      payload.profile_id = "";
+      payload.role = "";
+    }
     delete payload.assignment_type;
     await submitJson("/api/portal/admin/documents", payload);
   }
