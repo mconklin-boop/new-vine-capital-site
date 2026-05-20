@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { getPortalSession, logPortalEvent } from "../../../../lib/portalAuth";
 import { getSupabaseAdmin } from "../../../../lib/supabaseAdmin";
 
