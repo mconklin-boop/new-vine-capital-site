@@ -1,32 +1,27 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-[#8c6a2d]/15 bg-[#050505]">
-      <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="New Vine Capital logo"
-              width={42}
-              height={42}
-              className="h-10 w-10 object-contain"
-            />
-            <div>
-              <div className="text-sm font-semibold tracking-[0.18em] text-[#d7bb74]">
-                NEW VINE CAPITAL
-              </div>
-              <div className="text-xs text-[#9f9a89]">
-                Private Lending • Strategic Capital
-              </div>
-            </div>
-          </div>
-
-          <div className="text-sm text-[#9f9a89]">
-            deals@newvinecapital.com • 720-817-4277 • 1500 N Grant St #7339 Denver, CO 80203
-          </div>
+    <footer className="border-t border-white/10 bg-[#030403] text-white/70">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[1fr_auto] lg:px-8">
+        <div className="max-w-xl">
+          <Image src="/logo.png" alt="New Vine Capital" width={76} height={76} className="h-20 w-20 object-contain" />
+          <p className="mt-4 text-sm leading-7">
+            Fast Private Capital Solutions for real estate investors, brokers, developers, wholesalers, and business owners.
+          </p>
         </div>
+
+        <nav className="flex flex-wrap gap-5 text-xs font-black uppercase tracking-wide text-white/80">
+          <Link href="/loan-programs" className="hover:text-[#d5ad62]">Loan Programs</Link>
+          <Link href="/investors" className="hover:text-[#d5ad62]">Investors</Link>
+          <Link href="/funding-process" className="hover:text-[#d5ad62]">Process</Link>
+          <Link href="/contact" className="hover:text-[#d5ad62]">Contact</Link>
+        </nav>
+
+        <p className="border-t border-white/10 pt-6 text-xs leading-6 text-white/50 lg:col-span-2">
+          New Vine Capital is not a bank. All loans and investment opportunities are subject to underwriting, diligence, eligibility, market conditions, and final approval. This website is for informational purposes only and is not an offer to lend, sell securities, or provide investment advice. Investment opportunities involve risk and may not be suitable for all investors.
+        </p>
       </div>
     </footer>
   );
