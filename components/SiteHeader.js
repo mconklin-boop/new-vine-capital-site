@@ -10,7 +10,6 @@ const navItems = [
   { href: "/funding-process", label: "Process" },
   { href: "/investors", label: "Investors" },
   { href: "/contact", label: "Contact" },
-  { href: "/investor-portal", label: "Investor Login" },
 ];
 
 export { JOTFORM_URL };
