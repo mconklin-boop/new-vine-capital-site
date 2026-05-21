@@ -33,8 +33,8 @@ export default function Home() {
                 <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">
                   Submit Deal
                 </a>
-                <Link href="/contact#schedule" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">
-                  Schedule a Call
+                <Link href="/contact" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">
+                  Contact Us
                 </Link>
               </div>
             </div>
