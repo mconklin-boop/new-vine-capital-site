@@ -22,13 +22,13 @@ export function DealCard({ deal }) {
   const percent = fundedPercent(deal);
   return (
     <article className="grid gap-5 border border-white/10 bg-[#111613] p-6 shadow-xl shadow-black/10 lg:grid-cols-[1fr_auto]">
-      <div>
+      <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3"><StatusPill status={deal.status} /><span className="text-xs font-black uppercase tracking-[0.16em] text-[#d5ad62]">{deal.investmentType}</span></div>
         <h3 className="mt-4 text-2xl font-black text-white">{deal.name}</h3>
         <p className="mt-2 text-sm text-white/55">{deal.location}</p>
         <p className="mt-4 max-w-3xl leading-7 text-white/65">{deal.summary}</p>
         {deal.strategyDescription && <div className="mt-4 max-w-3xl border-l-4 border-[#d5ad62] bg-white/5 p-4"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">What this fund does</p><p className="mt-2 text-sm leading-6 text-white/65">{deal.strategyDescription}</p></div>}
-        <div className="mt-5 grid gap-4 text-sm md:grid-cols-4">
+        <div className="mt-5 grid gap-4 text-sm sm:grid-cols-2 xl:grid-cols-4">
           <Metric label="Target Return" value={deal.targetReturn} />
           <Metric label="Minimum" value={currency(deal.minimumInvestment)} />
           <Metric label="Total Raise" value={currency(deal.totalRaise)} />
@@ -42,7 +42,7 @@ export function DealCard({ deal }) {
 }
 
 export function Metric({ label, value }) {
-  return <div className="border border-white/10 bg-white/5 p-4"><p className="text-[11px] font-black uppercase tracking-wide text-white/45">{label}</p><p className="mt-2 font-black text-white">{value}</p></div>;
+  return <div className="min-w-0 border border-white/10 bg-white/5 p-4"><p className="text-[10px] font-black uppercase tracking-wide text-white/45 sm:text-[11px]">{label}</p><p className="mt-2 break-words text-lg font-black leading-tight text-white sm:text-xl">{value}</p></div>;
 }
 
 export function MockDownloadButton({ children = "Download" }) {
