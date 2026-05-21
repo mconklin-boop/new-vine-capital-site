@@ -22,5 +22,5 @@ export default async function handler(req, res) {
 
   await logPortalEvent({ type: "login_success", userId: result.user.id, email: result.user.email });
   res.setHeader("Set-Cookie", createSessionCookies(result.session));
-  return res.status(200).json({ ok: true, redirect: "/investor-portal/dashboard" });
+  return res.status(200).json({ ok: true, redirect: "/investor/dashboard" });
 }
