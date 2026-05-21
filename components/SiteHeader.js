@@ -25,35 +25,24 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-5 text-xs font-black uppercase tracking-wide text-white/70 lg:flex">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="transition hover:text-[#d5ad62]">
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => <Link key={item.href} href={item.href} className="transition hover:text-[#d5ad62]">{item.label}</Link>)}
         </nav>
 
-        <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="hidden bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] lg:inline-flex">
-          Submit Deal
-        </a>
+        <Link href="/investor-portal" className="hidden bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] lg:inline-flex">
+          Investor Portal Login
+        </Link>
 
         <button type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen(!open)} className="grid h-11 w-11 place-items-center border border-white/15 lg:hidden">
-          <span className="grid gap-1.5">
-            <span className="block h-0.5 w-6 bg-white" />
-            <span className="block h-0.5 w-6 bg-white" />
-          </span>
+          <span className="grid gap-1.5"><span className="block h-0.5 w-6 bg-white" /><span className="block h-0.5 w-6 bg-white" /></span>
         </button>
       </div>
 
       {open && (
         <nav className="grid gap-1 border-t border-white/10 bg-[#050605] px-5 py-5 text-sm font-black uppercase text-white/80 lg:hidden">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="py-3 transition hover:text-[#d5ad62]">
-              {item.label}
-            </Link>
-          ))}
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
-            Submit Deal
-          </a>
+          {navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="py-3 transition hover:text-[#d5ad62]">{item.label}</Link>)}
+          <Link href="/investor-portal" onClick={() => setOpen(false)} className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
+            Investor Portal Login
+          </Link>
         </nav>
       )}
     </header>
