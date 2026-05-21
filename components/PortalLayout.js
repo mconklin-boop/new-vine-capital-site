@@ -2,11 +2,11 @@ import Link from "next/link";
 import SiteFooter from "./SiteFooter";
 
 const nav = [
-  ["/investor-portal/dashboard", "Dashboard"],
-  ["/investor-portal/documents", "Documents"],
-  ["/investor-portal/monthly-updates", "Monthly Updates"],
-  ["/investor-portal/profile", "Investment Profile"],
-  ["/investor-portal/support", "Support"],
+  ["/investor/dashboard", "Dashboard"],
+  ["/investor/opportunities", "Opportunities"],
+  ["/investor/documents", "Documents"],
+  ["/investor/reporting", "Reporting"],
+  ["/investor/profile", "Profile"],
 ];
 
 export default function PortalLayout({ user, title, children }) {
@@ -39,7 +39,7 @@ export default function PortalLayout({ user, title, children }) {
       </main>
 
       <div className="mx-auto max-w-7xl px-5 pb-10 text-xs leading-6 text-white/45 lg:px-8">
-        This portal is for informational purposes only and is restricted to approved investors and authorized users. Nothing contained herein constitutes an offer to sell securities or a solicitation of an offer to buy securities. Any investment opportunity is subject to qualification, suitability review, legal documentation, and applicable securities laws.
+        Investment opportunities are available only to qualified investors. All investments involve risk, including possible loss of principal. Target returns are not guaranteed and are subject to market conditions and offering documents.
       </div>
       <SiteFooter />
     </div>
