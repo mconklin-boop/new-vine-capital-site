@@ -30,6 +30,7 @@ export default function PortalLayout({ user, title, children }) {
           {nav.map(([href, label]) => <Link key={href} href={href} className="shrink-0 whitespace-nowrap border border-white/10 px-4 py-3 hover:border-[#d5ad62] hover:text-[#d5ad62]">{label}</Link>)}
           {isAdmin && <Link href="/investor-portal/admin" className="shrink-0 whitespace-nowrap border border-[#d5ad62]/50 px-4 py-3 text-[#d5ad62]">Admin</Link>}
           {isAdmin && <Link href="/investor-portal/admin-investments" className="shrink-0 whitespace-nowrap border border-[#d5ad62]/50 px-4 py-3 text-[#d5ad62]">Investment Admin</Link>}
+          {isAdmin && <Link href="/investor-portal/admin-call-requests" className="shrink-0 whitespace-nowrap border border-[#d5ad62]/50 px-4 py-3 text-[#d5ad62]">Call Requests</Link>}
         </nav>
       </header>
 
