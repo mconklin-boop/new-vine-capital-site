@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import SiteFooter from "../../components/SiteFooter";
-
-const INVESTOR_INQUIRY_URL = "https://form.jotform.com/261394894022057";
+import { siteLinks } from "../../lib/siteLinks";
 
 export default function InvestorPortalLogin() {
   const [error, setError] = useState("");
@@ -44,7 +43,7 @@ export default function InvestorPortalLogin() {
           <div className="mt-6 border border-[#d5ad62]/40 bg-[#d5ad62]/10 p-5">
             <p className="text-sm font-black uppercase tracking-wide text-[#d5ad62]">Not approved yet?</p>
             <p className="mt-2 text-sm leading-6 text-white/65">Request investor information and begin New Vine Capital's qualification and suitability review process.</p>
-            <a href={INVESTOR_INQUIRY_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex w-full justify-center bg-[#d5ad62] px-5 py-3 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] sm:w-auto">Become an Approved Investor</a>
+            <a href={siteLinks.jotformInvestorIntake} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex w-full justify-center bg-[#d5ad62] px-5 py-3 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] sm:w-auto">Become an Approved Investor</a>
           </div>
 
           <div className="mt-6 flex flex-wrap justify-between gap-3 text-sm text-white/60">
