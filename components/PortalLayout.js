@@ -20,6 +20,7 @@ export default function PortalLayout({ user, title, children }) {
             <h1 className="mt-1 font-serif text-3xl">Investor Portal</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm text-white/70">
+            <Link href="/" className="border border-[#d5ad62]/60 px-4 py-2 text-xs font-black uppercase text-[#d5ad62] hover:bg-[#d5ad62] hover:text-[#11100b]">Back to Main Site</Link>
             <span>{user?.name}</span>
             <span className="border border-white/15 px-3 py-1 text-xs uppercase">{user?.role}</span>
             <form action="/api/portal/logout" method="post"><button className="bg-white/10 px-4 py-2 text-xs font-black uppercase hover:bg-white/20">Log Out</button></form>
