@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import PortalLayout from "../../../components/PortalLayout";
-import { DocumentAlertCard, Metric, MockDownloadButton, Panel, ProgressBar, StatusPill } from "../../../components/InvestorPortalCards";
+import { DocumentAlertCard, Metric, Panel, ProgressBar, StatusPill } from "../../../components/InvestorPortalCards";
 import { getInvestorDeal, listInvestorDocuments, listInvestorUpdates } from "../../../lib/investorPortalDb";
 import { requirePortalSession } from "../../../lib/portalAuth";
 import { currency, fundedPercent } from "../../../lib/investorPortalMockData";
