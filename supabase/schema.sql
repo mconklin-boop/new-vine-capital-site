@@ -64,16 +64,38 @@ create table if not exists public.portal_activity_logs (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.investor_call_requests (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  phone text not null,
+  entity_name text,
+  notes text,
+  requested_slot text not null,
+  requested_start text not null,
+  requested_end text not null,
+  timezone text not null default 'America/Denver',
+  status text not null default 'Requested',
+  google_event_id text,
+  hubspot_contact_id text,
+  hubspot_meeting_id text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists portal_documents_category_idx on public.portal_documents(category);
 create index if not exists portal_assignments_profile_idx on public.portal_document_assignments(profile_id);
 create index if not exists portal_assignments_role_idx on public.portal_document_assignments(role);
 create index if not exists portal_activity_user_idx on public.portal_activity_logs(user_id, created_at desc);
+create index if not exists investor_call_requests_email_idx on public.investor_call_requests(email, created_at desc);
+create index if not exists investor_call_requests_status_idx on public.investor_call_requests(status, created_at desc);
 
 alter table public.portal_profiles enable row level security;
 alter table public.portal_documents enable row level security;
 alter table public.portal_document_assignments enable row level security;
 alter table public.portal_monthly_updates enable row level security;
 alter table public.portal_activity_logs enable row level security;
+alter table public.investor_call_requests enable row level security;
 
 -- This app uses the Vercel server with SUPABASE_SERVICE_ROLE_KEY for protected reads/writes.
 -- Keep portal documents in a private Supabase Storage bucket named: portal-documents.
