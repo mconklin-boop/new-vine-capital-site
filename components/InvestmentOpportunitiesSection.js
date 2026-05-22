@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Link from "next/link";
 import { dealOpportunities, investmentFunds, investorAccessSteps, investorTrustPoints } from "../lib/investmentOpportunities";
 import { siteLinks } from "../lib/siteLinks";
 
@@ -106,7 +105,6 @@ export default function InvestmentOpportunitiesSection() {
             <h3 className="mt-3 font-serif text-3xl leading-tight md:text-4xl">How Investor Access Works</h3>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
               <a href={siteLinks.jotformInvestorIntake} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Complete Investor Intake</a>
-              <Link href={siteLinks.investorBookCall} className="border border-[#d5ad62]/70 px-6 py-4 text-center text-xs font-black uppercase text-[#d5ad62] transition hover:bg-[#d5ad62] hover:text-[#11100b]">Schedule Investor Call</Link>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
