@@ -32,9 +32,9 @@ export default function InvestorDashboard({ user, deals = [], documents = [], up
       <section className="border border-white/10 bg-[#111613] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-3"><StatusPill status="Open" /><span className="text-xs font-black uppercase tracking-[0.16em] text-[#d5ad62]">Available only to approved investors</span></div>
         <h3 className="mt-4 max-w-4xl font-serif text-4xl leading-tight md:text-6xl">Welcome to the New Vine Capital Investor Network</h3>
-        <p className="mt-5 max-w-4xl leading-8 text-white/65">Review private investment opportunities, document alerts, pending commitments, and portfolio reporting from your secure investor portal.</p>
+        <p className="mt-5 max-w-4xl leading-8 text-white/75">Review private investment opportunities, document alerts, pending commitments, and portfolio reporting from your secure investor portal.</p>
         <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {quickActions.map(([href, label, detail]) => <Link key={label} href={href} className="border border-white/10 bg-white/[0.04] p-4 transition hover:border-[#d5ad62]/70 hover:bg-[#d5ad62]/10"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{label}</p><p className="mt-2 text-sm leading-5 text-white/55">{detail}</p></Link>)}
+          {quickActions.map(([href, label, detail]) => <Link key={label} href={href} className="border border-white/10 bg-white/[0.04] p-4 transition hover:border-[#d5ad62]/70 hover:bg-[#d5ad62]/10"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{label}</p><p className="mt-2 text-sm leading-5 text-white/65">{detail}</p></Link>)}
         </div>
       </section>
 
@@ -50,7 +50,7 @@ export default function InvestorDashboard({ user, deals = [], documents = [], up
       <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_0.75fr]">
         <div>
           <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Open Investment Opportunities</p><h3 className="mt-2 text-2xl font-black">Available Deal Rooms</h3></div><Link href="/investor/opportunities" className="border-b border-[#d5ad62] pb-1 text-xs font-black uppercase text-[#d5ad62]">View All</Link></div>
-          <div className="grid gap-5">{openDeals.map((deal) => <DealCard key={deal.id} deal={deal} />)}</div>
+          <div className="grid gap-5">{openDeals.map((deal) => <DealCard key={deal.id} deal={deal} compact />)}</div>
         </div>
 
         <div className="grid content-start gap-5">
@@ -59,11 +59,11 @@ export default function InvestorDashboard({ user, deals = [], documents = [], up
           </Panel>
           <Panel eyebrow="Recent Activity" title="Portal Feed">
             <div className="grid gap-4">
-              {activity.map((item) => <article key={`${item.date}-${item.title}`} className="border border-white/10 bg-white/[0.04] p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{item.date}</p><span className="border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-white/60">{item.status}</span></div><h4 className="mt-3 font-black text-white">{item.title}</h4><p className="mt-2 text-sm leading-6 text-white/60">{item.description}</p></article>)}
+              {activity.map((item) => <article key={`${item.date}-${item.title}`} className="border border-white/10 bg-white/[0.04] p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{item.date}</p><span className="border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-white/65">{item.status}</span></div><h4 className="mt-3 font-black text-white">{item.title}</h4><p className="mt-2 text-sm leading-6 text-white/70">{item.description}</p></article>)}
             </div>
           </Panel>
           <Panel eyebrow="Investor Notices" title="Private access reminders">
-            <div className="grid gap-3">{notifications.map((item) => <div key={item.message} className="border border-white/10 bg-white/5 p-4"><p className="text-xs font-black uppercase text-[#d5ad62]">{item.type}</p><p className="mt-2 text-sm leading-6 text-white/65">{item.message}</p><p className="mt-2 text-xs text-white/40">{item.date}</p></div>)}</div>
+            <div className="grid gap-3">{notifications.map((item) => <div key={item.message} className="border border-white/10 bg-white/5 p-4"><p className="text-xs font-black uppercase text-[#d5ad62]">{item.type}</p><p className="mt-2 text-sm leading-6 text-white/70">{item.message}</p><p className="mt-2 text-xs text-white/45">{item.date}</p></div>)}</div>
           </Panel>
         </div>
       </section>
