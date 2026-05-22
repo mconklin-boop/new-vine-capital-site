@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { siteLinks } from "../lib/siteLinks";
 
-const JOTFORM_URL = "https://form.jotform.com/260916045657058";
+const JOTFORM_URL = siteLinks.jotformSubmitDeal;
 
 const navItems = [
   { href: "/loan-programs", label: "Loan Programs" },
