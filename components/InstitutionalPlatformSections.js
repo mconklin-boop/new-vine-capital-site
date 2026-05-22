@@ -49,7 +49,7 @@ export function PlatformActivitySection() {
           <p className="mt-5 text-lg leading-8 text-white/65">Historical platform activity across New Vine Capital investment strategies and capital relationships.</p>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {platformMetricCards.map(([label, key], index) => (
             <article key={key} className="nvc-reveal border border-white/10 bg-[#111613] p-5 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-[#d5ad62]/60" style={{ animationDelay: `${index * 50}ms` }}>
               <p className="min-h-[34px] text-[10px] font-black uppercase tracking-[0.14em] text-[#d5ad62]">{label}</p>
