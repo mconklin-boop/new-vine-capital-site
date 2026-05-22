@@ -4,13 +4,14 @@ import { DealCard, DocumentAlertCard, Panel, StatCard, StatusPill } from "../../
 import { getInvestorDashboardData } from "../../lib/investorPortalDb";
 import { currency } from "../../lib/investorPortalMockData";
 import { requirePortalSession } from "../../lib/portalAuth";
+import { siteLinks } from "../../lib/siteLinks";
 
 const quickActions = [
   ["/investor/opportunities", "View Opportunities", "Review active private credit opportunities."],
   ["/investor/documents", "Review Documents", "Open pending investor materials."],
   ["/investor/documents", "Complete Subscription", "Finish documents before funding."],
   ["/investor/documents", "Funding Instructions", "Released after commitment approval."],
-  ["/contact", "Schedule Investor Call", "Speak with investor relations."],
+  [siteLinks.investorBookCall, "Book Investor Call", "Schedule an intake or investor relations call."],
 ];
 
 const platformMetricCards = [
