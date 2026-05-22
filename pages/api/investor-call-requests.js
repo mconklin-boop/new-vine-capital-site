@@ -4,6 +4,12 @@ import { getSupabaseAdmin } from "../../lib/supabaseAdmin";
 const TIME_ZONE = "America/Denver";
 const DEFAULT_DURATION_MINUTES = 30;
 
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing Vercel environment variable: ${name}`);
+  return value;
+}
+
 function normalizePrivateKey(key) {
   return key ? key.replace(/\\n/g, "\n") : "";
 }
@@ -15,13 +21,7 @@ function base64Url(value) {
 function signJwt({ clientEmail, privateKey }) {
   const now = Math.floor(Date.now() / 1000);
   const header = base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const payload = base64Url(JSON.stringify({
-    iss: clientEmail,
-    scope: "https://www.googleapis.com/auth/calendar.events",
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now,
-  }));
+  const payload = base64Url(JSON.stringify({ iss: clientEmail, scope: "https://www.googleapis.com/auth/calendar.events", aud: "https://oauth2.googleapis.com/token", exp: now + 3600, iat: now }));
   const unsignedToken = `${header}.${payload}`;
   const signature = crypto.createSign("RSA-SHA256").update(unsignedToken).sign(privateKey, "base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
   return `${unsignedToken}.${signature}`;
@@ -48,17 +48,16 @@ function parseSlot(slot) {
 }
 
 async function sendNotificationEmail(payload, slotDetails) {
-  if (!process.env.RESEND_API_KEY || !process.env.SCHEDULER_NOTIFICATION_EMAIL) return null;
+  const apiKey = requireEnv("RESEND_API_KEY");
+  const notificationEmail = requireEnv("SCHEDULER_NOTIFICATION_EMAIL");
+  const fromEmail = process.env.SCHEDULER_FROM_EMAIL || "New Vine Capital <onboarding@resend.dev>";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: process.env.SCHEDULER_FROM_EMAIL || "New Vine Capital <onboarding@resend.dev>",
-      to: [process.env.SCHEDULER_NOTIFICATION_EMAIL],
+      from: fromEmail,
+      to: [notificationEmail],
       subject: `Investor intake call request: ${payload.name}`,
       text: [
         "New investor intake call request",
@@ -77,10 +76,9 @@ async function sendNotificationEmail(payload, slotDetails) {
 }
 
 async function createGoogleCalendarEvent(payload, slotDetails) {
-  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY);
-  const calendarId = process.env.GOOGLE_CALENDAR_ID;
-  if (!clientEmail || !privateKey || !calendarId) return null;
+  const clientEmail = requireEnv("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+  const privateKey = normalizePrivateKey(requireEnv("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"));
+  const calendarId = requireEnv("GOOGLE_CALENDAR_ID");
 
   const assertion = signJwt({ clientEmail, privateKey });
   const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
@@ -93,10 +91,7 @@ async function createGoogleCalendarEvent(payload, slotDetails) {
 
   const eventResponse = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=all`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${tokenData.access_token}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${tokenData.access_token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       summary: `Investor Intake Call - ${payload.name}`,
       description: `New Vine Capital investor intake call request.\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nEntity: ${payload.entity || "N/A"}\nNotes: ${payload.notes || "N/A"}`,
@@ -109,9 +104,25 @@ async function createGoogleCalendarEvent(payload, slotDetails) {
   return eventResponse.json();
 }
 
+async function searchHubSpotContactByEmail(token, email) {
+  const response = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      filterGroups: [{ filters: [{ propertyName: "email", operator: "EQ", value: email }] }],
+      properties: ["email", "firstname", "lastname", "phone", "company"],
+      limit: 1,
+    }),
+  });
+  if (!response.ok) throw new Error(`HubSpot contact search failed: ${await response.text()}`);
+  const data = await response.json();
+  return data.results?.[0] || null;
+}
+
 async function upsertHubSpotContact(payload) {
-  const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
-  if (!token) return null;
+  const token = requireEnv("HUBSPOT_PRIVATE_APP_TOKEN");
+  const existing = await searchHubSpotContactByEmail(token, payload.email);
+  if (existing) return existing;
 
   const contactResponse = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
     method: "POST",
@@ -127,15 +138,16 @@ async function upsertHubSpotContact(payload) {
     }),
   });
 
-  if (contactResponse.status === 409) return null;
+  if (contactResponse.status === 409) {
+    const duplicate = await searchHubSpotContactByEmail(token, payload.email);
+    if (duplicate) return duplicate;
+  }
   if (!contactResponse.ok) throw new Error(`HubSpot contact failed: ${await contactResponse.text()}`);
   return contactResponse.json();
 }
 
-async function createHubSpotMeeting(payload, slotDetails) {
-  const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
-  if (!token) return null;
-
+async function createHubSpotMeeting(payload, slotDetails, contactId) {
+  const token = requireEnv("HUBSPOT_PRIVATE_APP_TOKEN");
   const timestamp = new Date(`${slotDetails.startLocal}-06:00`).toISOString();
   const response = await fetch("https://api.hubapi.com/crm/v3/objects/meetings", {
     method: "POST",
@@ -147,6 +159,7 @@ async function createHubSpotMeeting(payload, slotDetails) {
         hs_meeting_body: `Requested time: ${slotDetails.display}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nEntity: ${payload.entity || "N/A"}\nNotes: ${payload.notes || "N/A"}`,
         hs_meeting_outcome: "SCHEDULED",
       },
+      associations: contactId ? [{ to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 200 }] }] : [],
     }),
   });
 
@@ -193,40 +206,60 @@ export default async function handler(req, res) {
     requestId = data.id;
     integrationResults.supabaseId = data.id;
   } catch (error) {
+    console.error("Investor call request Supabase save failed", error);
     return res.status(500).json({ error: "Could not save the call request." });
   }
 
-  for (const [key, task] of [
-    ["email", () => sendNotificationEmail(payload, slotDetails)],
-    ["googleCalendar", () => createGoogleCalendarEvent(payload, slotDetails)],
-    ["hubspotContact", () => upsertHubSpotContact(payload)],
-    ["hubspotMeeting", () => createHubSpotMeeting(payload, slotDetails)],
-  ]) {
-    try {
-      integrationResults[key] = await task();
-    } catch (error) {
-      integrationErrors.push({ key, message: error.message });
-    }
+  try {
+    integrationResults.email = await sendNotificationEmail(payload, slotDetails);
+  } catch (error) {
+    console.error("Investor scheduler email integration failed", error);
+    integrationErrors.push({ key: "email", message: error.message });
+  }
+
+  try {
+    integrationResults.googleCalendar = await createGoogleCalendarEvent(payload, slotDetails);
+  } catch (error) {
+    console.error("Investor scheduler Google Calendar integration failed", error);
+    integrationErrors.push({ key: "googleCalendar", message: error.message });
+  }
+
+  try {
+    integrationResults.hubspotContact = await upsertHubSpotContact(payload);
+  } catch (error) {
+    console.error("Investor scheduler HubSpot contact integration failed", error);
+    integrationErrors.push({ key: "hubspotContact", message: error.message });
+  }
+
+  try {
+    integrationResults.hubspotMeeting = await createHubSpotMeeting(payload, slotDetails, integrationResults.hubspotContact?.id);
+  } catch (error) {
+    console.error("Investor scheduler HubSpot meeting integration failed", error);
+    integrationErrors.push({ key: "hubspotMeeting", message: error.message });
   }
 
   const updatePayload = {
     google_event_id: integrationResults.googleCalendar?.id || null,
     hubspot_contact_id: integrationResults.hubspotContact?.id || null,
     hubspot_meeting_id: integrationResults.hubspotMeeting?.id || null,
-    status: integrationResults.googleCalendar?.id ? "Calendar Created" : "Requested",
+    email_sent_at: integrationResults.email?.id ? new Date().toISOString() : null,
+    integration_errors: integrationErrors,
+    status: integrationErrors.length ? "Integration Review Needed" : "Integrated",
     updated_at: new Date().toISOString(),
   };
 
-  await supabase.from("investor_call_requests").update(updatePayload).eq("id", requestId);
+  const { error: updateError } = await supabase.from("investor_call_requests").update(updatePayload).eq("id", requestId);
+  if (updateError) console.error("Investor call request integration status update failed", updateError);
 
   return res.status(200).json({
     ok: true,
     requestedTime: slotDetails.display,
     integrationResults: {
       saved: Boolean(integrationResults.supabaseId),
-      emailConfigured: Boolean(process.env.RESEND_API_KEY && process.env.SCHEDULER_NOTIFICATION_EMAIL),
-      googleCalendarConfigured: Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY && process.env.GOOGLE_CALENDAR_ID),
-      hubspotConfigured: Boolean(process.env.HUBSPOT_PRIVATE_APP_TOKEN),
+      emailSent: Boolean(integrationResults.email?.id),
+      googleCalendarCreated: Boolean(integrationResults.googleCalendar?.id),
+      hubspotContactId: integrationResults.hubspotContact?.id || null,
+      hubspotMeetingId: integrationResults.hubspotMeeting?.id || null,
     },
     integrationErrors,
   });
