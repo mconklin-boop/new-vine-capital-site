@@ -173,9 +173,10 @@ export default async function handler(req, res) {
 
   const integrationResults = {};
   const integrationErrors = [];
+  let requestId = null;
+  const supabase = getSupabaseAdmin();
 
   try {
-    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase.from("investor_call_requests").insert({
       name: payload.name,
       email: payload.email,
@@ -189,6 +190,7 @@ export default async function handler(req, res) {
       status: "Requested",
     }).select("id").single();
     if (error) throw error;
+    requestId = data.id;
     integrationResults.supabaseId = data.id;
   } catch (error) {
     return res.status(500).json({ error: "Could not save the call request." });
@@ -206,6 +208,16 @@ export default async function handler(req, res) {
       integrationErrors.push({ key, message: error.message });
     }
   }
+
+  const updatePayload = {
+    google_event_id: integrationResults.googleCalendar?.id || null,
+    hubspot_contact_id: integrationResults.hubspotContact?.id || null,
+    hubspot_meeting_id: integrationResults.hubspotMeeting?.id || null,
+    status: integrationResults.googleCalendar?.id ? "Calendar Created" : "Requested",
+    updated_at: new Date().toISOString(),
+  };
+
+  await supabase.from("investor_call_requests").update(updatePayload).eq("id", requestId);
 
   return res.status(200).json({
     ok: true,
