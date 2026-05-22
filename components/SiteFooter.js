@@ -20,7 +20,7 @@ export default function SiteFooter() {
         </nav>
 
         <p className="border-t border-white/10 pt-6 text-xs leading-6 text-white/50 lg:col-span-2">
-          New Vine Capital is not a bank. All loans and investment opportunities are subject to underwriting, diligence, eligibility, market conditions, and final approval. This website is for informational purposes only and is not an offer to lend, sell securities, or provide investment advice. Investment opportunities involve risk and may not be suitable for all investors.
+          Investment opportunities are available only to qualified investors. All investments involve risk, including possible loss of principal. Historical platform activity does not guarantee future results. Information contained on this website is for informational purposes only and does not constitute investment advice or an offer to sell securities. New Vine Capital is not a bank. All loans are subject to underwriting, diligence, eligibility, market conditions, and final approval.
         </p>
       </div>
     </footer>
