@@ -13,6 +13,15 @@ const quickActions = [
   ["/contact", "Schedule Investor Call", "Speak with investor relations."],
 ];
 
+const platformMetricCards = [
+  ["Total Platform Capital Deployed", "totalCapitalDeployed"],
+  ["Total Investor Commitments", "totalInvestorCommitments"],
+  ["Historical Funded Transactions", "transactionsFunded"],
+  ["Active Opportunities", "activeOpportunities"],
+  ["Capital Currently Allocated", "capitalCurrentlyAllocated"],
+  ["Distributions Processed", "distributionsProcessed"],
+];
+
 export async function getServerSideProps(context) {
   const auth = await requirePortalSession(context);
   if (!auth.props?.user) return auth;
@@ -20,7 +29,7 @@ export async function getServerSideProps(context) {
   return { props: { user: auth.props.user, ...data } };
 }
 
-export default function InvestorDashboard({ user, deals = [], documents = [], updates = [], notifications = [], activity = [], summary }) {
+export default function InvestorDashboard({ user, deals = [], documents = [], updates = [], notifications = [], activity = [], platformMetrics = {}, platformTimeline = [], summary }) {
   const openDeals = deals.filter((deal) => deal.status !== "Fully Subscribed");
   const pendingDocuments = documents.filter((doc) => ["Needs Review", "Pending Upload"].includes(doc.status || "Needs Review"));
   const documentAlerts = pendingDocuments.slice(0, 4);
@@ -45,6 +54,12 @@ export default function InvestorDashboard({ user, deals = [], documents = [], up
         <StatCard compact label="Documents" value={pendingDocuments.length} detail="Pending" />
         <StatCard compact label="Commitments" value={pendingCommitments} detail="Pending review" />
         <StatCard compact label="Distributions" value={upcomingDistributionCount} detail="Upcoming" />
+      </section>
+
+      <section className="mt-8 border border-white/10 bg-[#111613] p-5 md:p-6">
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Platform Metrics</p><h3 className="mt-2 text-2xl font-black text-white">New Vine Capital Platform Activity</h3></div><p className="max-w-2xl text-sm leading-6 text-white/55">Historical and informational figures only. Platform activity does not indicate future performance.</p></div>
+        <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-6">{platformMetricCards.map(([label, key]) => <StatCard key={key} compact label={label} value={platformMetrics[key] ?? "--"} />)}</div>
+        <div className="mt-6 grid gap-3 md:grid-cols-4">{platformTimeline.map((item) => <article key={`${item.date}-${item.title}`} className="border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-wide text-[#d5ad62]">{item.date} / {item.type}</p><h4 className="mt-2 font-black text-white">{item.title}</h4><p className="mt-2 text-sm leading-6 text-white/60">{item.description}</p></article>)}</div>
       </section>
 
       <section className="mt-8 grid gap-6 xl:grid-cols-[1fr_0.75fr]">
