@@ -79,9 +79,14 @@ create table if not exists public.investor_call_requests (
   google_event_id text,
   hubspot_contact_id text,
   hubspot_meeting_id text,
+  integration_errors jsonb not null default '[]'::jsonb,
+  email_sent_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.investor_call_requests add column if not exists integration_errors jsonb not null default '[]'::jsonb;
+alter table public.investor_call_requests add column if not exists email_sent_at timestamptz;
 
 create index if not exists portal_documents_category_idx on public.portal_documents(category);
 create index if not exists portal_assignments_profile_idx on public.portal_document_assignments(profile_id);
