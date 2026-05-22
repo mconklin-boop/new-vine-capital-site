@@ -21,16 +21,44 @@ const callTopics = [
 export default function InvestorScheduler() {
   const [selectedSlot, setSelectedSlot] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const selectedSlotLabel = useMemo(() => {
     if (!selectedSlot) return "No time selected";
     return selectedSlot.replace("|", " at ");
   }, [selectedSlot]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (!selectedSlot) return;
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    const formData = new FormData(event.currentTarget);
+    const payload = {
+      slot: selectedSlot,
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      entity: formData.get("entity"),
+      notes: formData.get("notes"),
+    };
+
+    try {
+      const response = await fetch("/api/investor-call-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Unable to submit the call request.");
+      setSubmitted(true);
+    } catch (error) {
+      setErrorMessage(error.message || "Unable to submit the call request.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -55,7 +83,8 @@ export default function InvestorScheduler() {
                 <label className="mt-5 grid gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#53615a]">Notes<textarea name="notes" rows="4" className="border border-black/10 bg-[#f4f1e9] px-4 py-3 text-base font-semibold normal-case tracking-normal text-[#050605] outline-none focus:border-[#1f5b3f]" placeholder="Optional topics you would like to discuss" /></label>
 
                 {!selectedSlot && <p className="mt-4 text-sm font-bold text-[#8a5b16]">Please select a time before submitting.</p>}
-                <button type="submit" className="mt-6 w-full bg-[#d5ad62] px-6 py-4 text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Request Intake Call</button>
+                {errorMessage && <p className="mt-4 border-l-4 border-[#8a2516] bg-[#fff0ed] p-3 text-sm font-bold text-[#8a2516]">{errorMessage}</p>}
+                <button type="submit" disabled={isSubmitting} className="mt-6 w-full bg-[#d5ad62] px-6 py-4 text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] disabled:cursor-not-allowed disabled:opacity-60">{isSubmitting ? "Submitting Request..." : "Request Intake Call"}</button>
                 <p className="mt-4 text-xs leading-5 text-[#53615a]">Call times are subject to confirmation by New Vine Capital. This scheduler does not create an investment offer or guarantee investor eligibility.</p>
               </>
             )}
