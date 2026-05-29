@@ -8,6 +8,7 @@ const JOTFORM_URL = siteLinks.jotformSubmitDeal;
 const navItems = [
   { href: "/", label: "Borrowers" },
   { href: "/investors", label: "Investors" },
+  { href: "/partners", label: "Partners" },
   { href: "/funding-process", label: "Process" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
