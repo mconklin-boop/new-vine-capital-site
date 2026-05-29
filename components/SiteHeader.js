@@ -6,8 +6,7 @@ import { siteLinks } from "../lib/siteLinks";
 const JOTFORM_URL = siteLinks.jotformSubmitDeal;
 
 const navItems = [
-  { href: "/loan-programs", label: "Borrowers" },
-  { href: "/loan-programs", label: "Loan Programs" },
+  { href: "/", label: "Borrowers" },
   { href: "/investors", label: "Investors" },
   { href: "/funding-process", label: "Process" },
   { href: "/about", label: "About" },
