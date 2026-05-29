@@ -81,7 +81,7 @@ export default function InvestmentOpportunitiesSection() {
         </div>
 
         <div className="mt-10 grid gap-2 border border-white/10 bg-[#111613] p-2 sm:inline-grid sm:grid-cols-2">
-          {[["funds", "Managed Funds"], ["deals", "Deal-by-Deal Opportunities"]].map(([key, label]) => (
+          {[["funds", "Passive Funds"], ["deals", "Deal-by-Deal Opportunities"]].map(([key, label]) => (
             <button key={key} type="button" onClick={() => setActiveTab(key)} className={`px-5 py-3 text-xs font-black uppercase tracking-[0.12em] transition ${activeTab === key ? "bg-[#d5ad62] text-[#11100b]" : "text-white/65 hover:bg-white/5 hover:text-white"}`}>{label}</button>
           ))}
         </div>
