@@ -44,9 +44,9 @@ export function PlatformActivitySection() {
     <section className="bg-[#0b0f0c] px-5 py-24 text-white lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-4xl">
-          <Eyebrow>Platform Activity</Eyebrow>
-          <h2 className="mt-4 font-serif text-4xl leading-tight md:text-6xl">Platform Activity</h2>
-          <p className="mt-5 text-lg leading-8 text-white/65">Historical platform activity across New Vine Capital investment strategies and capital relationships.</p>
+          <Eyebrow>Capital Platform Activity</Eyebrow>
+          <h2 className="mt-4 font-serif text-4xl leading-tight md:text-6xl">Capital Platform Activity</h2>
+          <p className="mt-5 text-lg leading-8 text-white/65">Real-time and historical activity across New Vine Capital's borrower pipeline, private credit strategies, and investor capital relationships.</p>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
