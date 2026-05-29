@@ -14,6 +14,7 @@ export default function SiteFooter() {
 
         <nav className="flex flex-wrap gap-5 text-xs font-black uppercase tracking-wide text-white/80">
           <Link href="/investors" className="hover:text-[#d5ad62]">Investors</Link>
+          <Link href="/partners" className="hover:text-[#d5ad62]">Partners</Link>
           <Link href="/funding-process" className="hover:text-[#d5ad62]">Process</Link>
           <Link href="/contact" className="hover:text-[#d5ad62]">Contact</Link>
         </nav>
