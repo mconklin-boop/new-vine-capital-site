@@ -77,7 +77,7 @@ export default function InvestorCommitmentForm({ deal }) {
             </button>
           ))}
         </div>
-        {fundingMethod === "Stripe Checkout" && <p className="mt-4 text-sm leading-6 text-white/50">You will be redirected to New Vine Capital's secure Stripe Checkout page. Payment details are handled by Stripe and are not stored by this portal.</p>}
+        {fundingMethod === "Stripe Checkout" && <p className="mt-4 text-sm leading-6 text-white/50">You will be redirected to the secure New Vine Capital Stripe Checkout page. Payment details are handled by Stripe and are not stored by this portal.</p>}
       </Panel>
 
       <Panel eyebrow="Step 4" title="Review Summary">
