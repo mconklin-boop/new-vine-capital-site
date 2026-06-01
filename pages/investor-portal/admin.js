@@ -62,7 +62,12 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
   async function createInvestor(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    await submitJson("/api/portal/admin/users", Object.fromEntries(form.entries()));
+    const payload = Object.fromEntries(form.entries());
+    payload.email = payload.investor_email;
+    payload.password = payload.temporary_password;
+    delete payload.investor_email;
+    delete payload.temporary_password;
+    await submitJson("/api/portal/admin/users", payload);
   }
 
   async function updateInvestor(event) {
@@ -108,19 +113,19 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
       <div className="grid gap-5 md:grid-cols-4">{summary.map(([label, value]) => <article key={label} className="border border-white/10 bg-[#111613] p-6"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{label}</p><h3 className="mt-3 text-3xl font-black">{value}</h3></article>)}</div>
 
       <section className="mt-8 grid gap-6 xl:grid-cols-2">
-        <form onSubmit={createInvestor} className="border border-white/10 bg-[#111613] p-7">
+        <form onSubmit={createInvestor} autoComplete="off" className="border border-white/10 bg-[#111613] p-7">
           <h3 className="text-2xl font-black">Create Investor Login</h3>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <Field label="Name"><input name="name" className={inputClass} /></Field>
-            <Field label="Email"><input name="email" type="email" required className={inputClass} /></Field>
-            <Field label="Temporary Password"><input name="password" type="password" required className={inputClass} /></Field>
-            <Field label="Phone"><input name="phone" className={inputClass} /></Field>
+            <Field label="Name"><input name="name" autoComplete="off" className={inputClass} /></Field>
+            <Field label="New Investor Email"><input name="investor_email" type="email" required autoComplete="off" placeholder="investor@example.com" className={inputClass} /></Field>
+            <Field label="Temporary Password"><input name="temporary_password" type="password" required autoComplete="new-password" className={inputClass} /></Field>
+            <Field label="Phone"><input name="phone" autoComplete="off" className={inputClass} /></Field>
             <Field label="Role"><select name="role" defaultValue="Pending Investor" className={inputClass}>{roles.map((role) => <option key={role}>{role}</option>)}</select></Field>
             <Field label="Status"><select name="status" defaultValue="Pending Investor" className={inputClass}>{statuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
-            <Field label="Entity Name"><input name="entity_name" className={inputClass} /></Field>
-            <Field label="Estimated Range"><input name="estimated_range" className={inputClass} placeholder="Example: $25,000 - $100,000" /></Field>
-            <Field label="Investor Type"><input name="investor_type" className={inputClass} placeholder="Individual, entity, advisor" /></Field>
-            <Field label="Relationship Source"><input name="relationship_source" className={inputClass} placeholder="JotForm, referral, broker" /></Field>
+            <Field label="Entity Name"><input name="entity_name" autoComplete="off" className={inputClass} /></Field>
+            <Field label="Estimated Range"><input name="estimated_range" autoComplete="off" className={inputClass} placeholder="Example: $25,000 - $100,000" /></Field>
+            <Field label="Investor Type"><input name="investor_type" autoComplete="off" className={inputClass} placeholder="Individual, entity, advisor" /></Field>
+            <Field label="Relationship Source"><input name="relationship_source" autoComplete="off" className={inputClass} placeholder="JotForm, referral, broker" /></Field>
           </div>
           <button disabled={busy} className="mt-6 bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] disabled:opacity-50">Create Login</button>
         </form>
