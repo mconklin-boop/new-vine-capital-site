@@ -3,6 +3,8 @@ import { canViewOfferingDocuments, getPortalSession, logPortalEvent } from "../.
 import { createStripeCheckoutSession, getSiteUrl } from "../../../lib/stripeServer";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 
+const creditCardFeeRate = 0.035;
+
 function toCents(amount) {
   return Math.round(Number(amount) * 100);
 }
@@ -23,6 +25,8 @@ export default async function handler(req, res) {
 
   const { deal_id, amount, funding_method, accreditation_confirmed } = req.body || {};
   const numericAmount = Number(amount);
+  const creditCardFee = numericAmount * creditCardFeeRate;
+  const paymentTotal = numericAmount + creditCardFee;
 
   if (!deal_id || !numericAmount || numericAmount <= 0 || !funding_method || !accreditation_confirmed) {
     return res.status(400).json({ error: "Missing payment details" });
@@ -43,7 +47,7 @@ export default async function handler(req, res) {
       amount: numericAmount,
       funding_method,
       accreditation_confirmed: Boolean(accreditation_confirmed),
-      status: "Credit Card Payment Started",
+      status: "Received",
     })
     .select("*")
     .single();
@@ -60,12 +64,11 @@ export default async function handler(req, res) {
     params.append("cancel_url", `${siteUrl}/investor/deals/${deal.id}?payment=cancelled`);
     params.append("submit_type", "pay");
     params.append("payment_method_types[0]", "card");
-    params.append("payment_method_types[1]", "us_bank_account");
     params.append("line_items[0][quantity]", "1");
     params.append("line_items[0][price_data][currency]", "usd");
-    params.append("line_items[0][price_data][unit_amount]", String(toCents(numericAmount)));
+    params.append("line_items[0][price_data][unit_amount]", String(toCents(paymentTotal)));
     params.append("line_items[0][price_data][product_data][name]", `${deal.name} Commitment`);
-    params.append("line_items[0][price_data][product_data][description]", "New Vine Capital investor commitment funding");
+    params.append("line_items[0][price_data][product_data][description]", "New Vine Capital investor commitment funding including 3.5% credit card processing fee");
     appendMetadata(params, "line_items[0][price_data][product_data]", {
       deal_id: deal.id,
       commitment_id: commitment.id,
@@ -76,6 +79,9 @@ export default async function handler(req, res) {
       investor_email: user.email,
       deal_id: deal.id,
       deal_name: deal.name,
+      commitment_amount: numericAmount,
+      credit_card_fee: creditCardFee.toFixed(2),
+      payment_total: paymentTotal.toFixed(2),
     });
 
     const checkoutSession = await createStripeCheckoutSession(params);
@@ -86,15 +92,19 @@ export default async function handler(req, res) {
       email: user.email,
       resourceType: "investor_commitment",
       resourceId: commitment.id,
-      metadata: { deal_id, amount: numericAmount, funding_method, stripe_checkout_session_id: checkoutSession.id },
+      metadata: { deal_id, amount: numericAmount, credit_card_fee: creditCardFee, payment_total: paymentTotal, funding_method, stripe_checkout_session_id: checkoutSession.id },
     });
 
     return res.status(200).json({ url: checkoutSession.url });
   } catch (stripeError) {
-    await supabase
-      .from("investor_commitments")
-      .update({ status: "Credit Card Payment Error" })
-      .eq("id", commitment.id);
+    await logPortalEvent({
+      type: "stripe_checkout_error",
+      userId: user.id,
+      email: user.email,
+      resourceType: "investor_commitment",
+      resourceId: commitment.id,
+      metadata: { deal_id, amount: numericAmount, funding_method, error: stripeError.message },
+    });
 
     return res.status(500).json({ error: stripeError.message });
   }
