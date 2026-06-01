@@ -1,10 +1,16 @@
 import { getInvestorDeal } from "../../../lib/investorPortalDb";
 import { canViewOfferingDocuments, getPortalSession, logPortalEvent } from "../../../lib/portalAuth";
-import { getStripe, getSiteUrl } from "../../../lib/stripeServer";
+import { createStripeCheckoutSession, getSiteUrl } from "../../../lib/stripeServer";
 import { getSupabaseAdmin } from "../../../lib/supabaseAdmin";
 
 function toCents(amount) {
   return Math.round(Number(amount) * 100);
+}
+
+function appendMetadata(params, prefix, metadata) {
+  Object.entries(metadata).forEach(([key, value]) => {
+    params.append(`${prefix}[metadata][${key}]`, String(value));
+  });
 }
 
 export default async function handler(req, res) {
@@ -44,55 +50,57 @@ export default async function handler(req, res) {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  const siteUrl = getSiteUrl(req);
-  const stripe = getStripe();
-  const checkoutSession = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: user.email,
-    client_reference_id: commitment.id,
-    success_url: `${siteUrl}/investor/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/investor/deals/${deal.id}?payment=cancelled`,
-    submit_type: "pay",
-    payment_method_types: ["card", "us_bank_account"],
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: "usd",
-          unit_amount: toCents(numericAmount),
-          product_data: {
-            name: `${deal.name} Commitment`,
-            description: "New Vine Capital investor commitment funding",
-            metadata: {
-              deal_id: deal.id,
-              commitment_id: commitment.id,
-            },
-          },
-        },
-      },
-    ],
-    metadata: {
+  try {
+    const siteUrl = getSiteUrl(req);
+    const params = new URLSearchParams();
+    params.append("mode", "payment");
+    params.append("customer_email", user.email);
+    params.append("client_reference_id", commitment.id);
+    params.append("success_url", `${siteUrl}/investor/payment-success?session_id={CHECKOUT_SESSION_ID}`);
+    params.append("cancel_url", `${siteUrl}/investor/deals/${deal.id}?payment=cancelled`);
+    params.append("submit_type", "pay");
+    params.append("payment_method_types[0]", "card");
+    params.append("payment_method_types[1]", "us_bank_account");
+    params.append("line_items[0][quantity]", "1");
+    params.append("line_items[0][price_data][currency]", "usd");
+    params.append("line_items[0][price_data][unit_amount]", String(toCents(numericAmount)));
+    params.append("line_items[0][price_data][product_data][name]", `${deal.name} Commitment`);
+    params.append("line_items[0][price_data][product_data][description]", "New Vine Capital investor commitment funding");
+    appendMetadata(params, "line_items[0][price_data][product_data]", {
+      deal_id: deal.id,
+      commitment_id: commitment.id,
+    });
+    appendMetadata(params, "", {
       commitment_id: commitment.id,
       investor_id: user.id,
       investor_email: user.email,
       deal_id: deal.id,
       deal_name: deal.name,
-    },
-  });
+    });
 
-  await supabase
-    .from("investor_commitments")
-    .update({ stripe_checkout_session_id: checkoutSession.id })
-    .eq("id", commitment.id);
+    const checkoutSession = await createStripeCheckoutSession(params);
 
-  await logPortalEvent({
-    type: "stripe_checkout_created",
-    userId: user.id,
-    email: user.email,
-    resourceType: "investor_commitment",
-    resourceId: commitment.id,
-    metadata: { deal_id, amount: numericAmount, funding_method, stripe_checkout_session_id: checkoutSession.id },
-  });
+    await supabase
+      .from("investor_commitments")
+      .update({ stripe_checkout_session_id: checkoutSession.id })
+      .eq("id", commitment.id);
 
-  return res.status(200).json({ url: checkoutSession.url });
+    await logPortalEvent({
+      type: "stripe_checkout_created",
+      userId: user.id,
+      email: user.email,
+      resourceType: "investor_commitment",
+      resourceId: commitment.id,
+      metadata: { deal_id, amount: numericAmount, funding_method, stripe_checkout_session_id: checkoutSession.id },
+    });
+
+    return res.status(200).json({ url: checkoutSession.url });
+  } catch (stripeError) {
+    await supabase
+      .from("investor_commitments")
+      .update({ status: "Stripe Checkout Error", payment_status: "Error" })
+      .eq("id", commitment.id);
+
+    return res.status(500).json({ error: stripeError.message });
+  }
 }
