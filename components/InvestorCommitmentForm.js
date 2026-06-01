@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Panel } from "./InvestorPortalCards";
 import { currency } from "../lib/investorPortalMockData";
 
-const fundingMethods = ["Stripe Checkout", "Wire", "ACH", "SDIRA", "Manual"];
+const fundingMethod = "Stripe Checkout";
 
 export default function InvestorCommitmentForm({ deal }) {
   const [amount, setAmount] = useState(deal.minimumInvestment);
-  const [fundingMethod, setFundingMethod] = useState("Stripe Checkout");
   const [accredited, setAccredited] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,8 +16,7 @@ export default function InvestorCommitmentForm({ deal }) {
     setProcessing(true);
 
     try {
-      const endpoint = fundingMethod === "Stripe Checkout" ? "/api/portal/create-checkout-session" : "/api/portal/investor-commitments";
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/portal/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -31,24 +28,12 @@ export default function InvestorCommitmentForm({ deal }) {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Unable to submit commitment request");
-      if (result.url) {
-        window.location.href = result.url;
-        return;
-      }
-      setSubmitted(true);
+      if (result.url) window.location.href = result.url;
     } catch (requestError) {
       setError(requestError.message);
     } finally {
       setProcessing(false);
     }
-  }
-
-  if (submitted) {
-    return (
-      <Panel eyebrow="Commitment Received" title="Funding instructions will be available in your portal.">
-        <p className="leading-8">Your commitment for {currency(Number(amount || 0))} in {deal.name} has been received for review. Funding instructions and final documents are provided only after approval and completion of applicable requirements.</p>
-      </Panel>
-    );
   }
 
   return (
@@ -70,14 +55,10 @@ export default function InvestorCommitmentForm({ deal }) {
       </Panel>
 
       <Panel eyebrow="Step 3" title="Funding Method">
-        <div className="grid gap-3 md:grid-cols-5">
-          {fundingMethods.map((method) => (
-            <button type="button" key={method} onClick={() => setFundingMethod(method)} className={`border px-4 py-3 text-xs font-black uppercase ${fundingMethod === method ? "border-[#d5ad62] bg-[#d5ad62] text-[#11100b]" : "border-white/10 bg-white/5 text-white/65"}`}>
-              {method}
-            </button>
-          ))}
+        <div className="border border-[#d5ad62]/40 bg-[#d5ad62]/10 p-5">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#d5ad62]">{fundingMethod}</p>
+          <p className="mt-3 text-sm leading-6 text-white/60">You will be redirected to the secure New Vine Capital Stripe Checkout page. Payment details are handled by Stripe and are not stored by this portal.</p>
         </div>
-        {fundingMethod === "Stripe Checkout" && <p className="mt-4 text-sm leading-6 text-white/50">You will be redirected to the secure New Vine Capital Stripe Checkout page. Payment details are handled by Stripe and are not stored by this portal.</p>}
       </Panel>
 
       <Panel eyebrow="Step 4" title="Review Summary">
@@ -92,7 +73,7 @@ export default function InvestorCommitmentForm({ deal }) {
       {error && <div className="border border-red-400/40 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>}
 
       <button disabled={!accredited || processing} className="w-full bg-[#d5ad62] px-6 py-4 text-sm font-black uppercase text-[#11100b] disabled:opacity-40">
-        {processing ? "Processing..." : fundingMethod === "Stripe Checkout" ? "Continue to Secure Payment" : "Submit Commitment Request"}
+        {processing ? "Processing..." : "Continue to Secure Payment"}
       </button>
     </form>
   );
