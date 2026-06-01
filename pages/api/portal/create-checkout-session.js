@@ -27,9 +27,6 @@ async function ensureInvestorDealExists(supabase, deal) {
     total_raise: Number(deal.totalRaise || 0),
     amount_funded: Number(deal.amountFunded || 0),
     status: deal.status || "Open",
-    term: deal.term || "Subject to offering documents",
-    distribution_frequency: deal.distributionFrequency || "Subject to offering documents",
-    summary: deal.summary || "Investor opportunity reviewed through the New Vine Capital portal.",
   }, { onConflict: "id" });
 
   if (error) throw error;
