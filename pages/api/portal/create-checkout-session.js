@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing payment details" });
   }
 
-  const deal = await getInvestorDeal(deal_id, { fallback: false });
+  const deal = await getInvestorDeal(deal_id);
   if (!deal) return res.status(404).json({ error: "Opportunity not found" });
   if (numericAmount < Number(deal.minimumInvestment || 0)) {
     return res.status(400).json({ error: "Amount is below the minimum investment" });
