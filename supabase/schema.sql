@@ -64,6 +64,21 @@ create table if not exists public.portal_activity_logs (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.investor_commitments (
+  id uuid primary key default gen_random_uuid(),
+  investor_id uuid references auth.users(id) on delete set null,
+  deal_id text not null,
+  amount numeric not null,
+  funding_method text not null,
+  accreditation_confirmed boolean not null default false,
+  status text not null default 'Received',
+  payment_status text not null default 'Not Started',
+  stripe_checkout_session_id text,
+  stripe_payment_intent_id text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.investor_call_requests (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -85,6 +100,10 @@ create table if not exists public.investor_call_requests (
   updated_at timestamptz not null default now()
 );
 
+alter table public.investor_commitments add column if not exists payment_status text not null default 'Not Started';
+alter table public.investor_commitments add column if not exists stripe_checkout_session_id text;
+alter table public.investor_commitments add column if not exists stripe_payment_intent_id text;
+alter table public.investor_commitments add column if not exists updated_at timestamptz not null default now();
 alter table public.investor_call_requests add column if not exists integration_errors jsonb not null default '[]'::jsonb;
 alter table public.investor_call_requests add column if not exists email_sent_at timestamptz;
 
@@ -92,6 +111,9 @@ create index if not exists portal_documents_category_idx on public.portal_docume
 create index if not exists portal_assignments_profile_idx on public.portal_document_assignments(profile_id);
 create index if not exists portal_assignments_role_idx on public.portal_document_assignments(role);
 create index if not exists portal_activity_user_idx on public.portal_activity_logs(user_id, created_at desc);
+create index if not exists investor_commitments_investor_idx on public.investor_commitments(investor_id, created_at desc);
+create index if not exists investor_commitments_deal_idx on public.investor_commitments(deal_id, created_at desc);
+create index if not exists investor_commitments_stripe_session_idx on public.investor_commitments(stripe_checkout_session_id);
 create index if not exists investor_call_requests_email_idx on public.investor_call_requests(email, created_at desc);
 create index if not exists investor_call_requests_status_idx on public.investor_call_requests(status, created_at desc);
 
@@ -100,8 +122,10 @@ alter table public.portal_documents enable row level security;
 alter table public.portal_document_assignments enable row level security;
 alter table public.portal_monthly_updates enable row level security;
 alter table public.portal_activity_logs enable row level security;
+alter table public.investor_commitments enable row level security;
 alter table public.investor_call_requests enable row level security;
 
 -- This app uses the Vercel server with SUPABASE_SERVICE_ROLE_KEY for protected reads/writes.
 -- Keep portal documents in a private Supabase Storage bucket named: portal-documents.
 -- Do not make that bucket public. The app should issue signed URLs only after auth checks.
+-- Stripe payments use STRIPE_SECRET_KEY server-side only. Do not expose Stripe secret keys in browser code.
