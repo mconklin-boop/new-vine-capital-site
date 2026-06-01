@@ -43,8 +43,7 @@ export default async function handler(req, res) {
       amount: numericAmount,
       funding_method,
       accreditation_confirmed: Boolean(accreditation_confirmed),
-      status: "Stripe Checkout Created",
-      payment_status: "Pending",
+      status: "Credit Card Payment Started",
     })
     .select("*")
     .single();
@@ -81,11 +80,6 @@ export default async function handler(req, res) {
 
     const checkoutSession = await createStripeCheckoutSession(params);
 
-    await supabase
-      .from("investor_commitments")
-      .update({ stripe_checkout_session_id: checkoutSession.id })
-      .eq("id", commitment.id);
-
     await logPortalEvent({
       type: "stripe_checkout_created",
       userId: user.id,
@@ -99,7 +93,7 @@ export default async function handler(req, res) {
   } catch (stripeError) {
     await supabase
       .from("investor_commitments")
-      .update({ status: "Stripe Checkout Error", payment_status: "Error" })
+      .update({ status: "Credit Card Payment Error" })
       .eq("id", commitment.id);
 
     return res.status(500).json({ error: stripeError.message });
