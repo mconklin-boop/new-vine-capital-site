@@ -16,6 +16,25 @@ function appendMetadata(params, prefix, metadata) {
   });
 }
 
+async function ensureInvestorDealExists(supabase, deal) {
+  const { error } = await supabase.from("investor_deals").upsert({
+    id: deal.id,
+    name: deal.name,
+    location: deal.location || "Nationwide",
+    investment_type: deal.investmentType || "Fund",
+    target_return: deal.targetReturn || "Subject to offering documents",
+    minimum_investment: Number(deal.minimumInvestment || 0),
+    total_raise: Number(deal.totalRaise || 0),
+    amount_funded: Number(deal.amountFunded || 0),
+    status: deal.status || "Open",
+    term: deal.term || "Subject to offering documents",
+    distribution_frequency: deal.distributionFrequency || "Subject to offering documents",
+    summary: deal.summary || "Investor opportunity reviewed through the New Vine Capital portal.",
+  }, { onConflict: "id" });
+
+  if (error) throw error;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -39,6 +58,13 @@ export default async function handler(req, res) {
   }
 
   const supabase = getSupabaseAdmin();
+
+  try {
+    await ensureInvestorDealExists(supabase, deal);
+  } catch (dealError) {
+    return res.status(500).json({ error: dealError.message });
+  }
+
   const { data: commitment, error } = await supabase
     .from("investor_commitments")
     .insert({
