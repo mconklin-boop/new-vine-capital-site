@@ -9,7 +9,8 @@ function toCents(amount) {
 
 function appendMetadata(params, prefix, metadata) {
   Object.entries(metadata).forEach(([key, value]) => {
-    params.append(`${prefix}[metadata][${key}]`, String(value));
+    const name = prefix ? `${prefix}[metadata][${key}]` : `metadata[${key}]`;
+    params.append(name, String(value));
   });
 }
 
