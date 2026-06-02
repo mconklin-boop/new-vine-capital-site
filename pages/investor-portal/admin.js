@@ -59,7 +59,7 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
       setMessage(data.error || "Something went wrong.");
       return;
     }
-    setMessage("Saved. Refreshing...");
+    setMessage(data.invited ? "Investor invite sent. Refreshing..." : "Saved. Refreshing...");
     window.location.reload();
   }
 
@@ -68,9 +68,7 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
     const form = new FormData(event.currentTarget);
     const payload = Object.fromEntries(form.entries());
     payload.email = payload.investor_email;
-    payload.password = payload.temporary_password;
     delete payload.investor_email;
-    delete payload.temporary_password;
     await submitJson("/api/portal/admin/users", payload);
   }
 
@@ -126,11 +124,11 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
 
       <section className="mt-8 grid gap-6 xl:grid-cols-2">
         <form onSubmit={createInvestor} autoComplete="off" className="border border-white/10 bg-[#111613] p-7">
-          <h3 className="text-2xl font-black">Create Investor Login</h3>
+          <h3 className="text-2xl font-black">Create Investor Login & Send Invite</h3>
+          <p className="mt-3 text-sm leading-6 text-white/55">Create the investor profile and send a secure email invitation so the investor can create their own portal password.</p>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <Field label="Name"><input name="name" autoComplete="off" className={inputClass} /></Field>
             <Field label="New Investor Email"><input name="investor_email" type="email" required autoComplete="off" placeholder="investor@example.com" className={inputClass} /></Field>
-            <Field label="Temporary Password"><input name="temporary_password" type="password" required autoComplete="new-password" className={inputClass} /></Field>
             <Field label="Phone"><input name="phone" autoComplete="off" className={inputClass} /></Field>
             <Field label="Role"><select name="role" defaultValue="Pending Investor" className={inputClass}>{roles.map((role) => <option key={role}>{role}</option>)}</select></Field>
             <Field label="Status"><select name="status" defaultValue="Pending Investor" className={inputClass}>{statuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
@@ -139,7 +137,7 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
             <Field label="Investor Type"><input name="investor_type" autoComplete="off" className={inputClass} placeholder="Individual, entity, advisor" /></Field>
             <Field label="Relationship Source"><input name="relationship_source" autoComplete="off" className={inputClass} placeholder="JotForm, referral, broker" /></Field>
           </div>
-          <button disabled={busy} className="mt-6 bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] disabled:opacity-50">Create Login</button>
+          <button disabled={busy} className="mt-6 bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] disabled:opacity-50">Create Login & Send Invite</button>
         </form>
 
         <form onSubmit={updateInvestor} className="border border-white/10 bg-[#111613] p-7">
