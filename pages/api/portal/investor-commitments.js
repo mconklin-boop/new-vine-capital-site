@@ -11,7 +11,7 @@ function formatCurrency(value) {
 async function sendCommitmentNotification({ user, deal, commitment, fundingMethod }) {
   if (!process.env.RESEND_API_KEY) {
     console.info("Skipping commitment notification email because RESEND_API_KEY is not configured.");
-    return { skipped: true };
+    return { skipped: true, reason: "RESEND_API_KEY is not configured" };
   }
 
   const dealName = deal?.name || commitment.deal_id;
@@ -56,6 +56,12 @@ async function sendCommitmentNotification({ user, deal, commitment, fundingMetho
   return response.json();
 }
 
+function notificationEventType(emailResult) {
+  if (emailResult?.skipped) return "commitment_notification_skipped";
+  if (emailResult?.error) return "commitment_notification_failed";
+  return "commitment_notification_sent";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   const user = await getPortalSession(req);
@@ -68,7 +74,7 @@ export default async function handler(req, res) {
 
   const { data: deal } = await supabase.from("investor_deals").select("id, name, investment_type").eq("id", deal_id).maybeSingle();
 
-  let emailResult = { skipped: true };
+  let emailResult = { skipped: true, reason: "Email notification was not attempted" };
   try {
     emailResult = await sendCommitmentNotification({ user, deal, commitment: data, fundingMethod: funding_method });
   } catch (emailError) {
@@ -76,6 +82,7 @@ export default async function handler(req, res) {
     emailResult = { error: emailError.message };
   }
 
+  await logPortalEvent({ type: notificationEventType(emailResult), userId: user.id, email: user.email, resourceType: "investor_commitment", resourceId: data.id, metadata: { deal_id, notificationEmail, emailFrom, emailResult } });
   await logPortalEvent({ type: "investor_commitment_submit", userId: user.id, email: user.email, resourceType: "investor_commitment", resourceId: data.id, metadata: { deal_id, amount, funding_method, notificationEmail, emailResult } });
   return res.status(201).json({ commitment: data });
 }
