@@ -5,7 +5,7 @@ import { getSupabaseAdmin } from "../../lib/supabaseAdmin";
 
 const inputClass = "w-full border border-white/10 bg-[#050605] px-4 py-3 text-white outline-none focus:border-[#d5ad62]";
 const statuses = ["Open", "Closing Soon", "Fully Subscribed"];
-const investmentTypes = ["Debt", "Equity", "Preferred Equity", "Gap Funding", "Fund"];
+const investmentTypes = ["Debt", "Equity", "Preferred Equity", "2nd Position", "1st Position", "EMD", "Appraisal", "Fund"];
 const documentTypes = ["PPM", "Operating Agreement", "Subscription Agreement", "Investor Deck", "Underwriting Summary", "Appraisal / Valuation", "Funding Instructions", "Quarterly Statement", "K-1", "Signed Docs"];
 
 export async function getServerSideProps(context) {
