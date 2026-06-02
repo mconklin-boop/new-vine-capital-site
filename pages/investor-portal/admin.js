@@ -18,7 +18,7 @@ export async function getServerSideProps(context) {
   const [{ data: users }, { data: documents }, { data: logs }, { data: updates }, { data: deals }] = await Promise.all([
     supabase.from("portal_profiles").select("id, name, email, role, status, deactivated, created_at").order("created_at", { ascending: false }).limit(50),
     supabase.from("portal_documents").select("id, name, category, upload_date").order("upload_date", { ascending: false }).limit(50),
-    supabase.from("portal_activity_logs").select("id, email, event_type, created_at").order("created_at", { ascending: false }).limit(25),
+    supabase.from("portal_activity_logs").select("id, email, event_type, metadata, created_at").order("created_at", { ascending: false }).limit(25),
     supabase.from("portal_monthly_updates").select("id, title, update_date").order("update_date", { ascending: false }).limit(20),
     supabase.from("investor_deals").select("id, name, investment_type, status, total_raise, amount_funded, created_at").order("created_at", { ascending: false }).limit(50),
   ]);
@@ -37,6 +37,12 @@ async function readFileAsDataUrl(file) {
 
 function Field({ label, children }) {
   return <label className="grid gap-2 text-sm font-bold text-white/70"><span>{label}</span>{children}</label>;
+}
+
+function logDetail(item) {
+  const result = item.metadata?.emailResult;
+  if (!result) return "";
+  return result.error || result.reason || (result.id ? `Email id: ${result.id}` : "");
 }
 
 const inputClass = "w-full border border-white/10 bg-[#050605] px-4 py-3 text-white outline-none focus:border-[#d5ad62]";
@@ -219,7 +225,7 @@ export default function AdminDashboard({ user, users = [], documents = [], logs 
         <article className="border border-white/10 bg-[#111613] p-7"><h3 className="text-2xl font-black">Investor Opportunities</h3><div className="mt-5 grid gap-3">{deals.map((item) => <div key={item.id} className="border border-white/10 bg-white/5 p-4"><p className="font-black">{item.name}</p><p className="mt-1 text-sm text-white/55">{item.investment_type} / {item.status}</p></div>)}</div>{!deals.length && <p className="mt-5 text-white/55">No opportunities have been created yet.</p>}</article>
         <article className="border border-white/10 bg-[#111613] p-7"><h3 className="text-2xl font-black">Document Library</h3><div className="mt-5 grid gap-3">{documents.map((item) => <div key={item.id} className="border border-white/10 bg-white/5 p-4"><p className="font-black">{item.name}</p><p className="mt-1 text-sm text-white/55">{item.category} / {item.upload_date}</p></div>)}</div>{!documents.length && <p className="mt-5 text-white/55">No documents uploaded yet.</p>}</article>
         <article className="border border-white/10 bg-[#111613] p-7"><h3 className="text-2xl font-black">Monthly Updates</h3><div className="mt-5 grid gap-3">{updates.map((item) => <div key={item.id} className="border border-white/10 bg-white/5 p-4"><p className="font-black">{item.title}</p><p className="mt-1 text-sm text-white/55">{item.update_date}</p></div>)}</div>{!updates.length && <p className="mt-5 text-white/55">No updates posted yet.</p>}</article>
-        <article className="border border-white/10 bg-[#111613] p-7 lg:col-span-2"><h3 className="text-2xl font-black">Access Logs</h3><div className="mt-5 grid gap-3">{logs.map((item) => <div key={item.id} className="border border-white/10 bg-white/5 p-4"><p className="font-black">{item.event_type}</p><p className="mt-1 text-sm text-white/55">{item.email || "System"} / {item.created_at}</p></div>)}</div></article>
+        <article className="border border-white/10 bg-[#111613] p-7 lg:col-span-2"><h3 className="text-2xl font-black">Access Logs</h3><div className="mt-5 grid gap-3">{logs.map((item) => { const detail = logDetail(item); return <div key={item.id} className="border border-white/10 bg-white/5 p-4"><p className="font-black">{item.event_type}</p><p className="mt-1 text-sm text-white/55">{item.email || "System"} / {item.created_at}</p>{detail && <p className="mt-3 break-words border border-red-400/30 bg-red-500/10 p-3 text-sm leading-6 text-red-100">{detail}</p>}</div>; })}</div></article>
       </section>
     </PortalLayout>
   );
