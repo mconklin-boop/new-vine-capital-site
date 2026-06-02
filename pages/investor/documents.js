@@ -7,7 +7,7 @@ import { requirePortalSession } from "../../lib/portalAuth";
 export async function getServerSideProps(context) {
   const auth = await requirePortalSession(context);
   if (!auth.props?.user) return auth;
-  const [deals, documents] = await Promise.all([listInvestorDeals({ user: auth.props.user }), listInvestorDocuments()]);
+  const [deals, documents] = await Promise.all([listInvestorDeals({ user: auth.props.user }), listInvestorDocuments({ user: auth.props.user })]);
   return { props: { user: auth.props.user, deals, documents } };
 }
 
