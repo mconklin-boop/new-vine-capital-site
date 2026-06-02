@@ -6,7 +6,7 @@ import { getInvestorDeal, listInvestorDocuments, listInvestorUpdates } from "../
 import { requirePortalSession } from "../../../lib/portalAuth";
 import { currency, fundedPercent } from "../../../lib/investorPortalMockData";
 
-const tabs = ["Overview", "Financials", "Documents", "Updates", "Invest"];
+const tabs = ["Invest", "Overview", "Financials", "Documents", "Updates"];
 
 const defaultRiskNotes = [
   "Target returns are not guaranteed.",
@@ -49,7 +49,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function DealRoom({ user, deal, allDocuments = [], allUpdates = [] }) {
-  const [activeTab, setActiveTab] = useState("Overview");
+  const [activeTab, setActiveTab] = useState("Invest");
   const documents = useMemo(() => allDocuments.filter((doc) => doc.dealId === deal.id), [allDocuments, deal.id]);
   const updates = useMemo(() => allUpdates.filter((update) => update.dealId === deal.id), [allUpdates, deal.id]);
   const percent = fundedPercent(deal);
