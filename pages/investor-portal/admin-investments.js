@@ -7,6 +7,7 @@ const inputClass = "w-full border border-white/10 bg-[#050605] px-4 py-3 text-wh
 const statuses = ["Open", "Closing Soon", "Fully Subscribed"];
 const investmentTypes = ["Debt", "Equity", "Preferred Equity", "2nd Position", "1st Position", "EMD", "Appraisal", "Fund"];
 const documentTypes = ["PPM", "Operating Agreement", "Subscription Agreement", "Investor Deck", "Underwriting Summary", "Appraisal / Valuation", "Funding Instructions", "Quarterly Statement", "K-1", "Signed Docs"];
+const investorDocumentCategories = ["Company Overview", "Fund Materials", "Risk Disclosures", "Subscription Documents", "Tax Documents", "Monthly Reports", "Investor Notices"];
 
 export async function getServerSideProps(context) {
   const result = await requirePortalSession(context, { roles: ["Admin"] });
@@ -77,6 +78,21 @@ export default function AdminInvestments({ user, deals = [], documents = [], upd
     await submitJson("/api/portal/admin/investor-deal-documents", payload);
   }
 
+  async function uploadInvestorDocument(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    const file = form.get("file");
+    delete payload.file;
+    if (file && file.size) {
+      payload.fileName = file.name;
+      payload.contentType = file.type;
+      payload.fileBase64 = await readFileAsDataUrl(file);
+    }
+    payload.role = "";
+    await submitJson("/api/portal/admin/documents", payload);
+  }
+
   async function postUpdate(event) {
     event.preventDefault();
     await submitJson("/api/portal/admin/investor-deal-updates", Object.fromEntries(new FormData(event.currentTarget).entries()));
@@ -103,6 +119,17 @@ export default function AdminInvestments({ user, deals = [], documents = [], upd
             <div className="grid gap-4 md:grid-cols-2"><Field label="Deal Name"><input name="name" required className={inputClass} /></Field><Field label="Custom Slug / ID"><input name="id" className={inputClass} placeholder="optional-custom-id" /></Field><Field label="Location"><input name="location" required className={inputClass} /></Field><Field label="Investment Type"><select name="investment_type" className={inputClass}>{investmentTypes.map((item) => <option key={item}>{item}</option>)}</select></Field><Field label="Target Return"><input name="target_return" required className={inputClass} placeholder="11.25% target annualized" /></Field><Field label="Status"><select name="status" className={inputClass}>{statuses.map((item) => <option key={item}>{item}</option>)}</select></Field><Field label="Minimum Investment"><input name="minimum_investment" type="number" className={inputClass} /></Field><Field label="Total Raise"><input name="total_raise" type="number" className={inputClass} /></Field><Field label="Amount Funded"><input name="amount_funded" type="number" className={inputClass} /></Field><Field label="Term"><input name="term" className={inputClass} /></Field><Field label="Preferred Return"><input name="preferred_return" className={inputClass} /></Field><Field label="LTV / Leverage"><input name="ltv" className={inputClass} /></Field><Field label="Equity Multiple"><input name="equity_multiple" className={inputClass} /></Field></div>
             <Field label="Executive Summary"><textarea name="summary" rows="3" className={inputClass} /></Field><Field label="Business Plan"><textarea name="business_plan" rows="3" className={inputClass} /></Field><Field label="Sponsor Notes"><textarea name="sponsor_notes" rows="3" className={inputClass} /></Field><Field label="Timeline, one item per line"><textarea name="timeline" rows="4" className={inputClass} /></Field><Field label="Capital Stack, one line as Label | Amount"><textarea name="capital_stack" rows="4" className={inputClass} placeholder="Senior debt | $750,000" /></Field><Field label="Sources and Uses, one line as Label | Amount"><textarea name="sources_uses" rows="4" className={inputClass} placeholder="Acquisition payoff | $640,000" /></Field><Field label="Sensitivity Summary"><textarea name="sensitivity" rows="4" className={inputClass} /></Field>
             <button disabled={busy} className="bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] disabled:opacity-50">Save Deal</button>
+          </form>
+        </Section>
+
+        <Section eyebrow="Investor Documents" title="Upload Document to Individual Investor">
+          <form onSubmit={uploadInvestorDocument} className="grid gap-4">
+            <Field label="Investor"><select name="profile_id" required className={inputClass}>{users.map((item) => <option key={item.id} value={item.id}>{item.name || item.email}</option>)}</select></Field>
+            <Field label="Document Name"><input name="name" required className={inputClass} /></Field>
+            <Field label="Category"><select name="category" required className={inputClass}>{investorDocumentCategories.map((item) => <option key={item}>{item}</option>)}</select></Field>
+            <Field label="File"><input name="file" type="file" required className={inputClass} /></Field>
+            <p className="text-sm leading-6 text-white/55">This uploads the file to private storage and assigns it only to the selected investor. It will appear in that investor's Document Center after upload.</p>
+            <button disabled={busy} className="bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] disabled:opacity-50">Upload Investor Document</button>
           </form>
         </Section>
 
