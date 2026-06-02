@@ -10,6 +10,14 @@ async function requireAdmin(req, res) {
   return user;
 }
 
+function getSiteOrigin(req) {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (configuredUrl) return configuredUrl.startsWith("http") ? configuredUrl : `https://${configuredUrl}`;
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  const protocol = req.headers["x-forwarded-proto"] || "https";
+  return `${protocol}://${host}`;
+}
+
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);
   if (!admin) return;
@@ -26,16 +34,16 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    const { email, password, name, phone, role = "Pending Investor", status = "Pending Investor", entity_name, investor_type, estimated_range, relationship_source } = req.body || {};
-    if (!email || !password) return res.status(400).json({ error: "Email and temporary password are required" });
+    const { email, name, phone, role = "Pending Investor", status = "Pending Investor", entity_name, investor_type, estimated_range, relationship_source } = req.body || {};
+    if (!email) return res.status(400).json({ error: "Email is required" });
 
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { name: name || email },
+    const redirectTo = `${getSiteOrigin(req)}/investor-portal/set-password`;
+    const { data: authData, error: authError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo,
+      data: { name: name || email },
     });
     if (authError) return res.status(500).json({ error: authError.message });
+    if (!authData?.user?.id) return res.status(500).json({ error: "Supabase did not return an invited user id" });
 
     const profile = {
       id: authData.user.id,
@@ -50,13 +58,19 @@ export default async function handler(req, res) {
       relationship_source: relationship_source || "Admin created",
       onboarding_status: status === "Approved Investor" ? "Approved" : "In review",
       compliance_review_status: status === "Approved Investor" ? "Approved" : "Pending review",
+      deactivated: false,
+      updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase.from("portal_profiles").insert(profile).select("*").single();
+    const { data, error } = await supabase
+      .from("portal_profiles")
+      .upsert(profile, { onConflict: "id" })
+      .select("*")
+      .single();
     if (error) return res.status(500).json({ error: error.message });
 
-    await logPortalEvent({ type: "admin_user_create", userId: admin.id, email: admin.email, resourceType: "portal_profile", resourceId: data.id, metadata: { email, role, status } });
-    return res.status(201).json({ user: data });
+    await logPortalEvent({ type: "admin_user_invite", userId: admin.id, email: admin.email, resourceType: "portal_profile", resourceId: data.id, metadata: { email, role, status, redirectTo } });
+    return res.status(201).json({ user: data, invited: true });
   }
 
   if (req.method === "PATCH") {
