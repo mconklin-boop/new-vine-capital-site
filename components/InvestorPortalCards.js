@@ -62,7 +62,7 @@ export function DealCard({ deal, compact = false }) {
             <div className="mt-4"><div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold uppercase text-white/65"><span>{currency(deal.amountFunded)} / {currency(deal.totalRaise)} funded</span><span>{percent}%</span></div><ProgressBar value={percent} thick /></div>
           </div>
         </div>
-        <Link href={`/investor/deals/${deal.id}`} className="mt-5 block w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">View Deal Room</Link>
+        <Link href={`/investor/deals/${deal.id}`} className="mt-5 block w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">View Fund</Link>
       </article>
     );
   }
@@ -86,7 +86,7 @@ export function DealCard({ deal, compact = false }) {
         </div>
         <div className="mt-5"><div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold uppercase text-white/65"><span>{currency(deal.amountFunded)} / {currency(deal.totalRaise)} funded</span><span>{percent}%</span></div><ProgressBar value={percent} thick /></div>
       </div>
-      <div className="flex items-end"><Link href={`/investor/deals/${deal.id}`} className="w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] xl:w-auto">View Deal Room</Link></div>
+      <div className="flex items-end"><Link href={`/investor/deals/${deal.id}`} className="w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] xl:w-auto">View Fund</Link></div>
     </article>
   );
 }
