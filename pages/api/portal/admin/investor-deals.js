@@ -41,6 +41,26 @@ function dealPayload(body) {
   };
 }
 
+async function replaceDealAssignments(supabase, dealId, body) {
+  const assignmentType = body.assignment_type || "all";
+  const profileId = body.profile_id || null;
+
+  const { error: deleteError } = await supabase.from("investor_deal_assignments").delete().eq("deal_id", dealId);
+  if (deleteError) throw deleteError;
+
+  const assignment = assignmentType === "specific"
+    ? { deal_id: dealId, profile_id: profileId, role: null }
+    : { deal_id: dealId, profile_id: null, role: "Approved Investor" };
+
+  if (assignmentType === "specific" && !profileId) {
+    throw new Error("Select a specific investor or choose All Approved Investors");
+  }
+
+  const { error } = await supabase.from("investor_deal_assignments").insert(assignment);
+  if (error) throw error;
+  return assignment;
+}
+
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);
   if (!admin) return;
@@ -57,8 +77,14 @@ export default async function handler(req, res) {
     if (!payload.name || !payload.location || !payload.investment_type || !payload.target_return) return res.status(400).json({ error: "Missing required deal fields" });
     const { data, error } = await supabase.from("investor_deals").upsert(payload).select("*").single();
     if (error) return res.status(500).json({ error: error.message });
-    await logPortalEvent({ type: "admin_investor_deal_upsert", userId: admin.id, email: admin.email, resourceType: "investor_deal", metadata: { id: data.id, name: data.name } });
-    return res.status(201).json({ deal: data });
+
+    try {
+      const assignment = await replaceDealAssignments(supabase, data.id, req.body || {});
+      await logPortalEvent({ type: "admin_investor_deal_upsert", userId: admin.id, email: admin.email, resourceType: "investor_deal", metadata: { id: data.id, name: data.name, assignment } });
+      return res.status(201).json({ deal: data, assignment });
+    } catch (assignmentError) {
+      return res.status(500).json({ error: assignmentError.message });
+    }
   }
 
   if (req.method === "PATCH") {
@@ -68,8 +94,14 @@ export default async function handler(req, res) {
     delete payload.id;
     const { data, error } = await supabase.from("investor_deals").update(payload).eq("id", id).select("*").single();
     if (error) return res.status(500).json({ error: error.message });
-    await logPortalEvent({ type: "admin_investor_deal_update", userId: admin.id, email: admin.email, resourceType: "investor_deal", metadata: { id } });
-    return res.status(200).json({ deal: data });
+
+    try {
+      const assignment = await replaceDealAssignments(supabase, id, req.body || {});
+      await logPortalEvent({ type: "admin_investor_deal_update", userId: admin.id, email: admin.email, resourceType: "investor_deal", metadata: { id, assignment } });
+      return res.status(200).json({ deal: data, assignment });
+    } catch (assignmentError) {
+      return res.status(500).json({ error: assignmentError.message });
+    }
   }
 
   return res.status(405).json({ error: "Method not allowed" });
