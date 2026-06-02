@@ -8,6 +8,12 @@ export async function getServerSideProps(context) {
 }
 
 const inputClass = "w-full border border-white/10 bg-[#050605] px-4 py-3 text-white outline-none focus:border-[#d5ad62]";
+const investorTypeOptions = ["Not specified", "Individual", "Joint Investors", "LLC / Entity", "Trust", "SDIRA / Retirement Account", "Advisor / Referral Partner", "Other"];
+const investmentRangeOptions = ["Not specified", "Under $10,000", "$10,000 - $24,999", "$25,000 - $49,999", "$50,000 - $99,999", "$100,000 - $249,999", "$250,000 - $499,999", "$500,000+", "Varies by opportunity"];
+
+function normalizeOption(value, options) {
+  return options.includes(value) ? value : "Not specified";
+}
 
 function Field({ label, children }) {
   return <label className="grid gap-2 text-sm font-bold text-white/70"><span>{label}</span>{children}</label>;
@@ -24,8 +30,8 @@ export default function InvestorProfile({ user }) {
     name: user.name || "",
     phone: user.phone || "",
     entity_name: user.entityName || "",
-    investor_type: user.investorType || "",
-    estimated_range: user.estimatedRange || "",
+    investor_type: normalizeOption(user.investorType, investorTypeOptions),
+    estimated_range: normalizeOption(user.estimatedRange, investmentRangeOptions),
     relationship_source: user.relationshipSource || "",
   });
 
@@ -83,8 +89,8 @@ export default function InvestorProfile({ user }) {
             <Field label="Investor name"><input name="name" value={form.name} onChange={updateField} className={inputClass} /></Field>
             <Field label="Phone"><input name="phone" value={form.phone} onChange={updateField} className={inputClass} /></Field>
             <Field label="Entity name"><input name="entity_name" value={form.entity_name} onChange={updateField} className={inputClass} placeholder="Individual, LLC, trust, etc." /></Field>
-            <Field label="Investor type"><input name="investor_type" value={form.investor_type} onChange={updateField} className={inputClass} placeholder="Individual, entity, advisor" /></Field>
-            <Field label="Estimated investment range"><input name="estimated_range" value={form.estimated_range} onChange={updateField} className={inputClass} placeholder="Example: $25,000 - $100,000" /></Field>
+            <Field label="Investor type"><select name="investor_type" value={form.investor_type} onChange={updateField} className={inputClass}>{investorTypeOptions.map((option) => <option key={option}>{option}</option>)}</select></Field>
+            <Field label="Estimated investment range"><select name="estimated_range" value={form.estimated_range} onChange={updateField} className={inputClass}>{investmentRangeOptions.map((option) => <option key={option}>{option}</option>)}</select></Field>
             <Field label="Relationship source"><input name="relationship_source" value={form.relationship_source} onChange={updateField} className={inputClass} placeholder="Referral, broker, JotForm, existing relationship" /></Field>
           </div>
 
