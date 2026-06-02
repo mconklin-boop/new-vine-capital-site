@@ -99,7 +99,7 @@ create table if not exists public.investor_distributions (
 create table if not exists public.portal_documents (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  category text not null check (category in ('Company Overview', 'Fund Materials', 'Risk Disclosures', 'Subscription Documents', 'Tax Documents', 'Monthly Reports', 'Investor Notices')),
+  category text not null check (category in ('Company Overview', 'Fund Materials', 'Risk Disclosures', 'Subscription Documents', 'Contracts', 'Tax Documents', 'Monthly Reports', 'Investor Notices', 'Other')),
   storage_path text not null,
   upload_date date not null default current_date,
   is_restricted boolean not null default true,
@@ -202,6 +202,9 @@ alter table public.investor_deals add column if not exists updated_at timestampt
 alter table public.investor_commitments add column if not exists updated_at timestamptz not null default now();
 alter table public.investor_call_requests add column if not exists integration_errors jsonb not null default '[]'::jsonb;
 alter table public.investor_call_requests add column if not exists email_sent_at timestamptz;
+
+alter table public.portal_documents drop constraint if exists portal_documents_category_check;
+alter table public.portal_documents add constraint portal_documents_category_check check (category in ('Company Overview', 'Fund Materials', 'Risk Disclosures', 'Subscription Documents', 'Contracts', 'Tax Documents', 'Monthly Reports', 'Investor Notices', 'Other'));
 
 create index if not exists investor_deals_status_idx on public.investor_deals(status, created_at desc);
 create index if not exists investor_deal_assignments_deal_idx on public.investor_deal_assignments(deal_id);
