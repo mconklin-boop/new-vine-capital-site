@@ -10,6 +10,8 @@ export const config = {
   },
 };
 
+const allowedCategories = ["Company Overview", "Fund Materials", "Risk Disclosures", "Subscription Documents", "Contracts", "Tax Documents", "Monthly Reports", "Investor Notices", "Other"];
+
 async function requireAdmin(req, res) {
   const user = await getPortalSession(req);
   if (!user || user.role !== "Admin") {
@@ -38,6 +40,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     const { name, category, storage_path, profile_id, role, fileName, contentType, fileBase64 } = req.body || {};
     if (!name || !category) return res.status(400).json({ error: "Document name and category are required" });
+    if (!allowedCategories.includes(category)) return res.status(400).json({ error: `Invalid document category: ${category}` });
 
     let finalStoragePath = storage_path;
 
@@ -61,7 +64,12 @@ export default async function handler(req, res) {
       .insert({ name, category, storage_path: finalStoragePath, uploaded_by: admin.id })
       .select("*")
       .single();
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      if (error.message?.includes("portal_documents_category_check")) {
+        return res.status(500).json({ error: "Supabase document categories are out of date. Run the portal_documents_category_check SQL update from supabase/schema.sql, then retry the upload." });
+      }
+      return res.status(500).json({ error: error.message });
+    }
 
     if (profile_id || role) {
       const { error: assignmentError } = await supabase.from("portal_document_assignments").insert({ document_id: document.id, profile_id: profile_id || null, role: role || null });
