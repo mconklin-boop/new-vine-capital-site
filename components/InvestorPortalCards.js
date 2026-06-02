@@ -12,6 +12,10 @@ function displayMetricValue(value) {
   return value;
 }
 
+function isFundOpportunity(deal) {
+  return deal?.investmentType === "Fund";
+}
+
 export function StatCard({ label, value, detail, compact = false }) {
   return <article className={`border border-white/10 bg-[#111613] shadow-xl shadow-black/10 ${compact ? "p-4" : "p-6"}`}><p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#d5ad62]">{label}</p><h3 className={`${compact ? "mt-2 text-xl" : "mt-4 text-2xl md:text-3xl"} font-black leading-tight text-white`}>{value}</h3>{detail && <p className="mt-2 text-xs leading-5 text-white/55">{detail}</p>}</article>;
 }
@@ -44,6 +48,10 @@ function OpportunityVisual({ type = "capital-stack", compact = false }) {
 
 export function DealCard({ deal, compact = false }) {
   const percent = fundedPercent(deal);
+  const isFund = isFundOpportunity(deal);
+  const viewLabel = isFund ? "View Fund" : "View Opportunity";
+  const strategyLabel = isFund ? "What this fund does" : "Opportunity strategy";
+
   if (compact) {
     return (
       <article className="border border-white/10 bg-[#111613] p-4 shadow-xl shadow-black/10 md:p-5">
@@ -62,7 +70,7 @@ export function DealCard({ deal, compact = false }) {
             <div className="mt-4"><div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold uppercase text-white/65"><span>{currency(deal.amountFunded)} / {currency(deal.totalRaise)} funded</span><span>{percent}%</span></div><ProgressBar value={percent} thick /></div>
           </div>
         </div>
-        <Link href={`/investor/deals/${deal.id}`} className="mt-5 block w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">View Fund</Link>
+        <Link href={`/investor/deals/${deal.id}`} className="mt-5 block w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">{viewLabel}</Link>
       </article>
     );
   }
@@ -75,7 +83,7 @@ export function DealCard({ deal, compact = false }) {
         <h3 className="mt-4 text-2xl font-black leading-tight text-white">{deal.name}</h3>
         <p className="mt-2 text-sm text-white/65">{deal.location} / Allocation subject to availability</p>
         <p className="mt-4 max-w-4xl leading-7 text-white/78">{deal.summary}</p>
-        {deal.strategyDescription && <div className="mt-4 max-w-4xl border-l-4 border-[#d5ad62] bg-white/[0.07] p-4"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">What this fund does</p><p className="mt-2 text-sm leading-6 text-white/78">{deal.strategyDescription}</p></div>}
+        {deal.strategyDescription && <div className="mt-4 max-w-4xl border-l-4 border-[#d5ad62] bg-white/[0.07] p-4"><p className="text-xs font-black uppercase tracking-wide text-[#d5ad62]">{strategyLabel}</p><p className="mt-2 text-sm leading-6 text-white/78">{deal.strategyDescription}</p></div>}
         <div className="mt-5 grid gap-3 sm:grid-cols-2 2xl:grid-cols-6">
           <Metric label="Target Return" value={deal.targetReturn} />
           <Metric label="Minimum" value={currency(deal.minimumInvestment)} />
@@ -86,7 +94,7 @@ export function DealCard({ deal, compact = false }) {
         </div>
         <div className="mt-5"><div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-bold uppercase text-white/65"><span>{currency(deal.amountFunded)} / {currency(deal.totalRaise)} funded</span><span>{percent}%</span></div><ProgressBar value={percent} thick /></div>
       </div>
-      <div className="flex items-end"><Link href={`/investor/deals/${deal.id}`} className="w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] xl:w-auto">View Fund</Link></div>
+      <div className="flex items-end"><Link href={`/investor/deals/${deal.id}`} className="w-full bg-[#d5ad62] px-6 py-4 text-center text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] xl:w-auto">{viewLabel}</Link></div>
     </article>
   );
 }
