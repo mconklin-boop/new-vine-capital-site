@@ -7,7 +7,7 @@ const roles = ["Admin", "Approved Investor", "Pending Investor", "Advisor / Refe
 const statuses = ["Approved Investor", "Pending Investor", "Advisor / Referral Partner", "Inactive"];
 const categories = ["Company Overview", "Fund Materials", "Risk Disclosures", "Subscription Documents", "Tax Documents", "Monthly Reports", "Investor Notices"];
 const opportunityStatuses = ["Open", "Closing Soon", "Fully Subscribed", "Pending Review"];
-const opportunityTypes = ["Private Credit", "Debt", "Equity", "Preferred Equity", "Gap Funding", "Fund", "Bridge Lending", "Transactional Funding"];
+const opportunityTypes = ["Private Credit", "Debt", "Equity", "Preferred Equity", "2nd Position", "1st Position", "EMD", "Appraisal", "Fund", "Bridge Lending", "Transactional Funding"];
 const opportunityCategories = ["Private Credit", "Managed Funds", "Direct Deals"];
 
 export async function getServerSideProps(context) {
