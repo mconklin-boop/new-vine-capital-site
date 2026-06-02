@@ -6,7 +6,7 @@ const fundingMethods = ["ACH Transfer", "Wire Transfer"];
 
 const fundingInstructions = [
   ["ACH Transfer", "ACH instructions will be provided by New Vine Capital after your commitment is reviewed and approved."],
-  ["Wire Transfer", "Wire instructions will be provided by New Vine Capital after your commitment is reviewed and approved."],
+  ["Wire Transfer", "Wire instructions will be released as a private Funding Instructions document in your investor portal after your commitment is reviewed and approved."],
 ];
 
 export default function InvestorCommitmentForm({ deal }) {
@@ -46,7 +46,7 @@ export default function InvestorCommitmentForm({ deal }) {
 
   if (submitted) {
     return (
-      <Panel eyebrow="Commitment Received" title="ACH and wire instructions will be available after review.">
+      <Panel eyebrow="Commitment Received" title="Funding instructions will be available after review.">
         <div className="grid gap-4 text-sm leading-7 text-white/70">
           <p>Your commitment request for {currency(numericAmount)} in {deal.name} has been received for New Vine Capital review.</p>
           <p>No payment has been processed through this portal. Funding instructions are released only after approval, suitability review, allocation availability, and completion of applicable offering documents.</p>
@@ -89,7 +89,7 @@ export default function InvestorCommitmentForm({ deal }) {
             </button>
           ))}
         </div>
-        <p className="mt-4 text-sm leading-6 text-white/50">Bank funding details are not displayed publicly. New Vine Capital will provide ACH or wire instructions after your commitment is reviewed and approved.</p>
+        <p className="mt-4 text-sm leading-6 text-white/50">Bank funding details are not displayed publicly. Wire instructions are released through a private Funding Instructions document in the investor portal only after New Vine Capital review and approval.</p>
       </Panel>
 
       <Panel eyebrow="Step 4" title="Review Summary">
