@@ -170,11 +170,21 @@ create table if not exists public.investor_call_requests (
   updated_at timestamptz not null default now()
 );
 
+alter table public.investor_deals add column if not exists name text;
+alter table public.investor_deals add column if not exists location text;
+alter table public.investor_deals add column if not exists investment_type text not null default 'Private Credit';
 alter table public.investor_deals add column if not exists categories jsonb not null default '["Private Credit"]'::jsonb;
+alter table public.investor_deals add column if not exists target_return text default 'Subject to offering documents';
+alter table public.investor_deals add column if not exists minimum_investment numeric not null default 0;
+alter table public.investor_deals add column if not exists total_raise numeric not null default 0;
+alter table public.investor_deals add column if not exists amount_funded numeric not null default 0;
+alter table public.investor_deals add column if not exists status text not null default 'Pending Review';
+alter table public.investor_deals add column if not exists term text default 'Subject to offering documents';
 alter table public.investor_deals add column if not exists distribution_frequency text default 'Subject to offering documents';
 alter table public.investor_deals add column if not exists preferred_return text default 'N/A';
 alter table public.investor_deals add column if not exists ltv text default 'N/A';
 alter table public.investor_deals add column if not exists equity_multiple text default 'N/A';
+alter table public.investor_deals add column if not exists summary text;
 alter table public.investor_deals add column if not exists strategy_description text;
 alter table public.investor_deals add column if not exists business_plan text;
 alter table public.investor_deals add column if not exists sponsor_notes text;
@@ -187,6 +197,7 @@ alter table public.investor_deals add column if not exists review_process jsonb 
 alter table public.investor_deals add column if not exists risk_notes jsonb not null default '[]'::jsonb;
 alter table public.investor_deals add column if not exists exclusivity_notes jsonb not null default '[]'::jsonb;
 alter table public.investor_deals add column if not exists visual_type text default 'capital-stack';
+alter table public.investor_deals add column if not exists created_at timestamptz not null default now();
 alter table public.investor_deals add column if not exists updated_at timestamptz not null default now();
 alter table public.investor_commitments add column if not exists updated_at timestamptz not null default now();
 alter table public.investor_call_requests add column if not exists integration_errors jsonb not null default '[]'::jsonb;
