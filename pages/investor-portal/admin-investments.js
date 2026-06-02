@@ -7,7 +7,7 @@ const inputClass = "w-full border border-white/10 bg-[#050605] px-4 py-3 text-wh
 const statuses = ["Open", "Closing Soon", "Fully Subscribed"];
 const investmentTypes = ["Debt", "Equity", "Preferred Equity", "2nd Position", "1st Position", "EMD", "Appraisal", "Fund"];
 const documentTypes = ["PPM", "Operating Agreement", "Subscription Agreement", "Investor Deck", "Underwriting Summary", "Appraisal / Valuation", "Funding Instructions", "Quarterly Statement", "K-1", "Signed Docs"];
-const investorDocumentCategories = ["Company Overview", "Fund Materials", "Risk Disclosures", "Subscription Documents", "Tax Documents", "Monthly Reports", "Investor Notices"];
+const investorDocumentCategories = ["Company Overview", "Fund Materials", "Risk Disclosures", "Subscription Documents", "Contracts", "Tax Documents", "Monthly Reports", "Investor Notices", "Other"];
 
 export async function getServerSideProps(context) {
   const result = await requirePortalSession(context, { roles: ["Admin"] });
