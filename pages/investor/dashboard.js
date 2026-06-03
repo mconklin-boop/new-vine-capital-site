@@ -2,7 +2,6 @@ import Link from "next/link";
 import PortalLayout from "../../components/PortalLayout";
 import { DealCard, StatCard, StatusPill } from "../../components/InvestorPortalCards";
 import { getInvestorDashboardData } from "../../lib/investorPortalDb";
-import { currency } from "../../lib/investorPortalMockData";
 import { requirePortalSession } from "../../lib/portalAuth";
 import { siteLinks } from "../../lib/siteLinks";
 
@@ -20,11 +19,10 @@ export async function getServerSideProps(context) {
   return { props: { user: auth.props.user, ...data } };
 }
 
-export default function InvestorDashboard({ user, deals = [], documents = [], summary }) {
+export default function InvestorDashboard({ user, deals = [], summary }) {
   const openDeals = deals.filter((deal) => deal.status !== "Fully Subscribed");
-  const pendingDocuments = documents.filter((doc) => ["Needs Review", "Pending Upload"].includes(doc.status || "Needs Review"));
-  const pendingCommitments = summary.pendingCommitments ?? openDeals.length;
-  const upcomingDistributionCount = 0;
+  const pendingCommitments = summary.pendingCommitments ?? 0;
+  const activeCommitments = summary.activeCommitments ?? summary.activeInvestments ?? 0;
 
   return (
     <PortalLayout user={user} title="Investor Dashboard">
@@ -37,17 +35,13 @@ export default function InvestorDashboard({ user, deals = [], documents = [], su
         </div>
       </section>
 
-      <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
-        <StatCard compact label="Committed" value={currency(summary.totalCommittedCapital)} detail="Investor record" />
-        <StatCard compact label="Funded" value={currency(summary.totalFundedCapital)} detail="Capital funded" />
-        <StatCard compact label="Active" value={summary.activeInvestments} detail="Investments" />
-        <StatCard compact label="Documents" value={pendingDocuments.length} detail="Pending" />
-        <StatCard compact label="Commitments" value={pendingCommitments} detail="Pending review" />
-        <StatCard compact label="Distributions" value={upcomingDistributionCount} detail="Upcoming" />
+      <section className="mt-6 grid gap-3 md:grid-cols-2">
+        <StatCard compact label="Pending Commitments" value={pendingCommitments} detail="Received, approved, or pending funding" />
+        <StatCard compact label="Active Commitments" value={activeCommitments} detail="Funded commitment records" />
       </section>
 
       <section className="mt-8">
-        <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Open Investment Opportunities</p><h3 className="mt-2 text-2xl font-black">Available Funds</h3></div><Link href="/investor/opportunities" className="border-b border-[#d5ad62] pb-1 text-xs font-black uppercase text-[#d5ad62]">View All</Link></div>
+        <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Open Investment Opportunities</p><h3 className="mt-2 text-2xl font-black">Available Opportunities</h3></div><Link href="/investor/opportunities" className="border-b border-[#d5ad62] pb-1 text-xs font-black uppercase text-[#d5ad62]">View All</Link></div>
         <div className="grid gap-5">{openDeals.map((deal) => <DealCard key={deal.id} deal={deal} compact />)}</div>
         {!openDeals.length && <div className="border border-white/10 bg-[#111613] p-6 text-white/60">No investment opportunities are currently assigned to your portal.</div>}
       </section>
