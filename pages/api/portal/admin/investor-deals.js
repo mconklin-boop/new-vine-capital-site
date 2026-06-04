@@ -7,7 +7,7 @@ function slugify(value) {
 }
 
 async function requireAdmin(req, res) {
-  const user = await getPortalSession(req);
+  const user = await getPortalSession(req, res);
   if (!user || user.role !== "Admin") {
     res.status(403).json({ error: "Admin access required" });
     return null;
