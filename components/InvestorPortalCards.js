@@ -120,7 +120,7 @@ export function DocumentAlertCard({ doc, opportunity }) {
         <h4 className="mt-2 font-black text-white">{doc.name}</h4>
         <p className="mt-1 text-sm text-white/60">{opportunity || "General Investor Documents"}</p>
       </div>
-      <button type="button" className="border border-[#d5ad62]/60 px-4 py-3 text-xs font-black uppercase text-[#d5ad62] hover:bg-[#d5ad62] hover:text-[#11100b]">Review Document</button>
+      <a href={`/api/portal/documents/${doc.id}`} target="_blank" rel="noreferrer" className="border border-[#d5ad62]/60 px-4 py-3 text-center text-xs font-black uppercase text-[#d5ad62] hover:bg-[#d5ad62] hover:text-[#11100b]">Review Document</a>
     </article>
   );
 }
