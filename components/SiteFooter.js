@@ -16,6 +16,7 @@ export default function SiteFooter() {
           <Link href="/investors" className="hover:text-[#d5ad62]">Investors</Link>
           <Link href="/funding-process" className="hover:text-[#d5ad62]">Process</Link>
           <Link href="/contact" className="hover:text-[#d5ad62]">Contact</Link>
+          <Link href="/privacy-policy" className="hover:text-[#d5ad62]">Privacy Policy</Link>
         </nav>
 
         <p className="border-t border-white/10 pt-6 text-xs leading-6 text-white/50 lg:col-span-2">
