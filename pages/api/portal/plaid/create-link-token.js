@@ -4,6 +4,17 @@ import { getPlaidClient, getPlaidCountryCodes, getPlaidProducts } from "../../..
 const DEFAULT_PLAID_REDIRECT_URI = "https://www.newvinecapital.com/investor/profile";
 const DEFAULT_PLAID_WEBHOOK_URL = "https://www.newvinecapital.com/api/plaid/webhook";
 
+function cleanUrl(value, fallback) {
+  const candidate = String(value || "").trim().replace(/^['\"]|['\"]$/g, "");
+  try {
+    const parsed = new URL(candidate || fallback);
+    if (!parsed.protocol.startsWith("http")) return fallback;
+    return parsed.toString();
+  } catch (error) {
+    return fallback;
+  }
+}
+
 function plaidSetupError(error) {
   const plaidError = error?.response?.data;
   if (!plaidError) return "Unable to start secure bank connection. Please check Plaid environment variables in Vercel.";
@@ -24,8 +35,8 @@ export default async function handler(req, res) {
 
   try {
     const plaid = getPlaidClient();
-    const redirectUri = process.env.PLAID_REDIRECT_URI || DEFAULT_PLAID_REDIRECT_URI;
-    const webhookUrl = process.env.PLAID_WEBHOOK_URL || DEFAULT_PLAID_WEBHOOK_URL;
+    const redirectUri = cleanUrl(process.env.PLAID_REDIRECT_URI, DEFAULT_PLAID_REDIRECT_URI);
+    const webhookUrl = cleanUrl(process.env.PLAID_WEBHOOK_URL, DEFAULT_PLAID_WEBHOOK_URL);
     const response = await plaid.linkTokenCreate({
       user: { client_user_id: user.id },
       client_name: "New Vine Capital",
