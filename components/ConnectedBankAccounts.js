@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+const PLAID_OAUTH_TOKEN_KEY = "nvc_plaid_link_token";
+
 function formatDate(value) {
   if (!value) return "Pending";
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
@@ -62,6 +64,11 @@ async function postJsonWithTimeout(url, body, timeoutMs = 30000) {
   }
 }
 
+function isPlaidOAuthReturn() {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).has("oauth_state_id");
+}
+
 export default function ConnectedBankAccounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,8 +88,63 @@ export default function ConnectedBankAccounts() {
     }
   }
 
+  async function finishPlaidSuccess(publicToken, metadata) {
+    setWorking("exchange");
+    try {
+      const payload = await parseJsonResponse(await postJsonWithTimeout("/api/portal/plaid/exchange-public-token", { publicToken, metadata }));
+      window.localStorage.removeItem(PLAID_OAUTH_TOKEN_KEY);
+      setAccounts(payload.accounts || []);
+      const first = payload.accounts?.[0];
+      setMessage({
+        type: "success",
+        text: first ? `Bank successfully connected. ${first.institutionName} / ${first.accountName} ending in ${first.accountMask}.` : "Bank successfully connected.",
+      });
+      if (window.location.search.includes("oauth_state_id")) window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (error) {
+      setMessage({ type: "error", text: error.message || "The bank connected, but the portal could not save the account. Please try again or contact New Vine Capital." });
+      await loadAccounts();
+    } finally {
+      setWorking("");
+    }
+  }
+
+  function createPlaidHandler(linkToken, receivedRedirectUri = null) {
+    return window.Plaid.create({
+      token: linkToken,
+      receivedRedirectUri,
+      onSuccess: finishPlaidSuccess,
+      onExit: (error) => {
+        if (error) setMessage({ type: "error", text: error.display_message || error.error_message || "Plaid Link closed before completing." });
+        setWorking("");
+      },
+    });
+  }
+
   useEffect(() => {
     loadAccounts();
+  }, []);
+
+  useEffect(() => {
+    async function resumeOAuth() {
+      if (!isPlaidOAuthReturn()) return;
+      const linkToken = window.localStorage.getItem(PLAID_OAUTH_TOKEN_KEY);
+      if (!linkToken) {
+        setMessage({ type: "error", text: "Plaid returned to the portal, but the secure connection session expired. Please click Connect Bank Account again." });
+        return;
+      }
+
+      try {
+        setWorking("connect");
+        setMessage({ type: "success", text: "Bank verification complete. Finishing secure connection..." });
+        await loadPlaidScript();
+        createPlaidHandler(linkToken, window.location.href).open();
+      } catch (error) {
+        setMessage({ type: "error", text: error.message });
+        setWorking("");
+      }
+    }
+
+    resumeOAuth();
   }, []);
 
   async function connectAccount() {
@@ -92,31 +154,8 @@ export default function ConnectedBankAccounts() {
     try {
       await loadPlaidScript();
       const { linkToken } = await parseJsonResponse(await fetch("/api/portal/plaid/create-link-token", { method: "POST" }));
-      const handler = window.Plaid.create({
-        token: linkToken,
-        onSuccess: async (publicToken, metadata) => {
-          setWorking("exchange");
-          try {
-            const payload = await parseJsonResponse(await postJsonWithTimeout("/api/portal/plaid/exchange-public-token", { publicToken, metadata }));
-            setAccounts(payload.accounts || []);
-            const first = payload.accounts?.[0];
-            setMessage({
-              type: "success",
-              text: first ? `Bank successfully connected. ${first.institutionName} / ${first.accountName} ending in ${first.accountMask}.` : "Bank successfully connected.",
-            });
-          } catch (error) {
-            setMessage({ type: "error", text: error.message || "The bank connected, but the portal could not save the account. Please try again or contact New Vine Capital." });
-            await loadAccounts();
-          } finally {
-            setWorking("");
-          }
-        },
-        onExit: (error) => {
-          if (error) setMessage({ type: "error", text: error.display_message || error.error_message || "Plaid Link closed before completing." });
-          setWorking("");
-        },
-      });
-      handler.open();
+      window.localStorage.setItem(PLAID_OAUTH_TOKEN_KEY, linkToken);
+      createPlaidHandler(linkToken).open();
     } catch (error) {
       setMessage({ type: "error", text: error.message });
       setWorking("");
