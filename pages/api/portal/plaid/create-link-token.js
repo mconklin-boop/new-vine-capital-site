@@ -4,6 +4,15 @@ import { getPlaidClient, getPlaidCountryCodes, getPlaidProducts } from "../../..
 const DEFAULT_PLAID_REDIRECT_URI = "https://www.newvinecapital.com/investor/profile";
 const DEFAULT_PLAID_WEBHOOK_URL = "https://www.newvinecapital.com/api/plaid/webhook";
 
+function plaidSetupError(error) {
+  const plaidError = error?.response?.data;
+  if (!plaidError) return "Unable to start secure bank connection. Please check Plaid environment variables in Vercel.";
+
+  const code = plaidError.error_code || plaidError.error_type || "PLAID_ERROR";
+  const message = plaidError.display_message || plaidError.error_message || "Plaid rejected the Link token setup.";
+  return `Plaid setup error (${code}): ${message}`;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -35,8 +44,21 @@ export default async function handler(req, res) {
     await logPortalEvent({ type: "plaid_link_token_created", userId: user.id, email: user.email, resourceType: "plaid_link", metadata: { redirectUri, webhookUrl } });
     return res.status(200).json({ linkToken: response.data.link_token, expiration: response.data.expiration, redirectUri });
   } catch (error) {
-    console.error("Plaid link token creation failed", error?.response?.data || error);
-    await logPortalEvent({ type: "plaid_link_token_failed", userId: user.id, email: user.email, resourceType: "plaid_link", metadata: { message: error.message } });
-    return res.status(500).json({ error: "Unable to start secure bank connection." });
+    const safeMessage = plaidSetupError(error);
+    const plaidError = error?.response?.data;
+    console.error("Plaid link token creation failed", plaidError || error);
+    await logPortalEvent({
+      type: "plaid_link_token_failed",
+      userId: user.id,
+      email: user.email,
+      resourceType: "plaid_link",
+      metadata: {
+        message: error.message,
+        plaidErrorCode: plaidError?.error_code || null,
+        plaidErrorType: plaidError?.error_type || null,
+        plaidRequestId: plaidError?.request_id || null,
+      },
+    });
+    return res.status(500).json({ error: safeMessage });
   }
 }
