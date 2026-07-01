@@ -6,6 +6,25 @@ function selectedAccountIds(metadata) {
   return new Set((metadata?.accounts || []).map((account) => account.id).filter(Boolean));
 }
 
+function safeSaveError(error) {
+  const plaidError = error?.response?.data;
+  if (plaidError) {
+    const code = plaidError.error_code || plaidError.error_type || "PLAID_ERROR";
+    const message = plaidError.display_message || plaidError.error_message || "Plaid rejected the account save request.";
+    return `Plaid save error (${code}): ${message}`;
+  }
+
+  if (error?.code || error?.details || error?.hint) {
+    return `Supabase save error${error.code ? ` (${error.code})` : ""}: ${error.message || "Database rejected the connected account."}`;
+  }
+
+  if (String(error?.message || "").includes("PLAID_TOKEN_ENCRYPTION_KEY")) {
+    return "Plaid save error: PLAID_TOKEN_ENCRYPTION_KEY is missing or too short in Vercel.";
+  }
+
+  return error?.message || "Unable to save connected bank account.";
+}
+
 async function getInstitution(plaid, institutionId) {
   if (!institutionId) return null;
 
@@ -104,8 +123,21 @@ export default async function handler(req, res) {
       accounts: await listSafeAccounts(user.id),
     });
   } catch (error) {
+    const safeMessage = safeSaveError(error);
     console.error("Plaid token exchange failed", error?.response?.data || error);
-    await logPortalEvent({ type: "plaid_account_connect_failed", userId: user.id, email: user.email, resourceType: "plaid_connected_accounts", metadata: { message: error.message } });
-    return res.status(500).json({ error: "Unable to save connected bank account." });
+    await logPortalEvent({
+      type: "plaid_account_connect_failed",
+      userId: user.id,
+      email: user.email,
+      resourceType: "plaid_connected_accounts",
+      metadata: {
+        message: error.message,
+        safeMessage,
+        errorCode: error.code || error?.response?.data?.error_code || null,
+        errorType: error?.response?.data?.error_type || null,
+        requestId: error?.response?.data?.request_id || null,
+      },
+    });
+    return res.status(500).json({ error: safeMessage });
   }
 }
