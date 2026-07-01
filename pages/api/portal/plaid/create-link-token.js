@@ -1,6 +1,8 @@
 import { getPortalSession, logPortalEvent } from "../../../../lib/portalAuth";
 import { getPlaidClient, getPlaidCountryCodes, getPlaidProducts } from "../../../../lib/plaid";
 
+const DEFAULT_PLAID_REDIRECT_URI = "https://www.newvinecapital.com/investor/profile";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -12,12 +14,14 @@ export default async function handler(req, res) {
 
   try {
     const plaid = getPlaidClient();
+    const redirectUri = process.env.PLAID_REDIRECT_URI || DEFAULT_PLAID_REDIRECT_URI;
     const response = await plaid.linkTokenCreate({
       user: { client_user_id: user.id },
       client_name: "New Vine Capital",
       products: getPlaidProducts(),
       country_codes: getPlaidCountryCodes(),
       language: "en",
+      redirect_uri: redirectUri,
       account_filters: {
         depository: {
           account_subtypes: ["checking", "savings"],
@@ -25,8 +29,8 @@ export default async function handler(req, res) {
       },
     });
 
-    await logPortalEvent({ type: "plaid_link_token_created", userId: user.id, email: user.email, resourceType: "plaid_link" });
-    return res.status(200).json({ linkToken: response.data.link_token, expiration: response.data.expiration });
+    await logPortalEvent({ type: "plaid_link_token_created", userId: user.id, email: user.email, resourceType: "plaid_link", metadata: { redirectUri } });
+    return res.status(200).json({ linkToken: response.data.link_token, expiration: response.data.expiration, redirectUri });
   } catch (error) {
     console.error("Plaid link token creation failed", error?.response?.data || error);
     await logPortalEvent({ type: "plaid_link_token_failed", userId: user.id, email: user.email, resourceType: "plaid_link", metadata: { message: error.message } });
