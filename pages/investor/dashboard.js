@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ConnectedBankAccounts from "../../components/ConnectedBankAccounts";
 import PortalLayout from "../../components/PortalLayout";
 import { DealCard, StatCard, StatusPill } from "../../components/InvestorPortalCards";
 import { getInvestorDashboardData } from "../../lib/investorPortalDb";
@@ -40,8 +39,6 @@ export default function InvestorDashboard({ user, deals = [], summary }) {
         <StatCard compact label="Pending Commitments" value={pendingCommitments} detail="Received, approved, or pending funding" />
         <StatCard compact label="Active Commitments" value={activeCommitments} detail="Funded commitment records" />
       </section>
-
-      <ConnectedBankAccounts />
 
       <section className="mt-8">
         <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#d5ad62]">Open Investment Opportunities</p><h3 className="mt-2 text-2xl font-black">Available Opportunities</h3></div><Link href="/investor/opportunities" className="border-b border-[#d5ad62] pb-1 text-xs font-black uppercase text-[#d5ad62]">View All</Link></div>
