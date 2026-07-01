@@ -43,6 +43,25 @@ async function parseJsonResponse(response) {
   return payload;
 }
 
+async function postJsonWithTimeout(url, body, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error.name === "AbortError") throw new Error("The bank connected, but saving the connection took too long. Please refresh the page and check whether the account appears.");
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export default function ConnectedBankAccounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,18 +96,20 @@ export default function ConnectedBankAccounts() {
         token: linkToken,
         onSuccess: async (publicToken, metadata) => {
           setWorking("exchange");
-          const payload = await parseJsonResponse(await fetch("/api/portal/plaid/exchange-public-token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ publicToken, metadata }),
-          }));
-          setAccounts(payload.accounts || []);
-          const first = payload.accounts?.[0];
-          setMessage({
-            type: "success",
-            text: first ? `Bank successfully connected. ${first.institutionName} / ${first.accountName} ending in ${first.accountMask}.` : "Bank successfully connected.",
-          });
-          setWorking("");
+          try {
+            const payload = await parseJsonResponse(await postJsonWithTimeout("/api/portal/plaid/exchange-public-token", { publicToken, metadata }));
+            setAccounts(payload.accounts || []);
+            const first = payload.accounts?.[0];
+            setMessage({
+              type: "success",
+              text: first ? `Bank successfully connected. ${first.institutionName} / ${first.accountName} ending in ${first.accountMask}.` : "Bank successfully connected.",
+            });
+          } catch (error) {
+            setMessage({ type: "error", text: error.message || "The bank connected, but the portal could not save the account. Please try again or contact New Vine Capital." });
+            await loadAccounts();
+          } finally {
+            setWorking("");
+          }
         },
         onExit: (error) => {
           if (error) setMessage({ type: "error", text: error.display_message || error.error_message || "Plaid Link closed before completing." });
@@ -147,7 +168,7 @@ export default function ConnectedBankAccounts() {
           <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">Connect an approved bank account for future ACH readiness, balance verification, investor deposits, borrower repayments, and distribution workflows. No money movement is enabled in this phase.</p>
         </div>
         <button type="button" onClick={connectAccount} disabled={Boolean(working)} className="w-full bg-[#d5ad62] px-6 py-4 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a] disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto">
-          {working === "connect" || working === "exchange" ? "Connecting..." : "Connect Bank Account"}
+          {working === "exchange" ? "Saving Connection..." : working === "connect" ? "Connecting..." : "Connect Bank Account"}
         </button>
       </div>
 
