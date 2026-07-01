@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConnectedBankAccounts from "../../components/ConnectedBankAccounts";
 import PortalLayout from "../../components/PortalLayout";
 import { Panel } from "../../components/InvestorPortalCards";
 import { requirePortalSession } from "../../lib/portalAuth";
@@ -107,6 +108,8 @@ export default function InvestorProfile({ user }) {
           <a href="mailto:deals@newvinecapital.com" className="mt-5 inline-flex border border-white/15 px-5 py-3 text-xs font-black uppercase text-white">Request Compliance Update</a>
         </aside>
       </section>
+
+      <ConnectedBankAccounts />
     </PortalLayout>
   );
 }
