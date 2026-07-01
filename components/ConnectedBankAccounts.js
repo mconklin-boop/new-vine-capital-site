@@ -18,6 +18,14 @@ function StatusBadge({ status }) {
   return <span className={`inline-flex border px-3 py-1 text-[10px] font-black uppercase tracking-wide ${connected ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200" : "border-white/20 bg-white/10 text-white/60"}`}>{connected ? "Connected" : status}</span>;
 }
 
+function bankSaveErrorText(error) {
+  const message = error?.message || "The bank connected, but the portal could not save the account. Please try again or contact New Vine Capital.";
+  if (message === "Unable to save connected bank account.") {
+    return "Unable to save connected bank account. Check that supabase/plaid-connected-accounts.sql has been run and PLAID_TOKEN_ENCRYPTION_KEY is set in Vercel, then redeploy.";
+  }
+  return message;
+}
+
 function loadPlaidScript() {
   if (typeof window === "undefined") return Promise.reject(new Error("Plaid Link is only available in the browser."));
   if (window.Plaid) return Promise.resolve();
@@ -101,7 +109,7 @@ export default function ConnectedBankAccounts() {
       });
       if (window.location.search.includes("oauth_state_id")) window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
-      setMessage({ type: "error", text: error.message || "The bank connected, but the portal could not save the account. Please try again or contact New Vine Capital." });
+      setMessage({ type: "error", text: bankSaveErrorText(error) });
       await loadAccounts();
     } finally {
       setWorking("");
