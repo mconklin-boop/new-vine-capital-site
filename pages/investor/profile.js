@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ConnectedBankAccounts from "../../components/ConnectedBankAccounts";
 import PortalLayout from "../../components/PortalLayout";
-import { Panel } from "../../components/InvestorPortalCards";
 import { requirePortalSession } from "../../lib/portalAuth";
 
 export async function getServerSideProps(context) {
@@ -74,9 +73,7 @@ export default function InvestorProfile({ user }) {
 
   return (
     <PortalLayout user={user} title="Investor Profile & Settings">
-      <Panel eyebrow="Profile Controls" title="Investor information on file">
-        <p>Investors may update contact and profile details directly in the portal. Compliance-sensitive information, accreditation status, tax records, and funding method details require Investor Relations or admin review before changes are finalized.</p>
-      </Panel>
+      <ConnectedBankAccounts />
 
       {message && <div className="mt-6 border border-[#d5ad62]/40 bg-[#d5ad62]/10 p-4 text-sm font-bold text-[#f0d99a]">{message}</div>}
 
@@ -108,8 +105,6 @@ export default function InvestorProfile({ user }) {
           <a href="mailto:deals@newvinecapital.com" className="mt-5 inline-flex border border-white/15 px-5 py-3 text-xs font-black uppercase text-white">Request Compliance Update</a>
         </aside>
       </section>
-
-      <ConnectedBankAccounts />
     </PortalLayout>
   );
 }
