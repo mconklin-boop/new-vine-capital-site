@@ -31,7 +31,7 @@ export default function Home() {
               <h1 className="mt-5 max-w-5xl font-serif text-5xl leading-none text-white md:text-7xl">Capital for the deals banks won&apos;t touch.</h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-white/80 md:text-xl">DSCR, fix and flip, bridge, gap and transactional financing for real estate investors, plus equipment and working capital for business owners. Underwritten on the asset and the exit, not a rigid checklist.</p>
               <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-                <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
+                <a href={JOTFORM_URL} className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
                 <Link href="/real-estate-funding" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">View Loan Programs</Link>
               </div>
             </div>
@@ -90,7 +90,7 @@ export default function Home() {
         <CtaBand />
       </main>
 
-      <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="fixed bottom-4 right-4 z-40 bg-[#d5ad62] px-5 py-4 text-xs font-black uppercase text-[#11100b] shadow-2xl shadow-black/40 md:right-6">Submit Deal</a>
+      <a href={JOTFORM_URL} className="fixed bottom-4 right-4 z-40 bg-[#d5ad62] px-5 py-4 text-xs font-black uppercase text-[#11100b] shadow-2xl shadow-black/40 md:right-6">Submit Deal</a>
       <SiteFooter />
     </div>
   );

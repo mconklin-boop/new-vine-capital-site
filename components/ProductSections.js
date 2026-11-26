@@ -24,7 +24,7 @@ export function ProductCard({ product, detailed = false }) {
         {product.href ? (
           <Link href={product.href} className="text-xs font-black uppercase tracking-wide text-[#d5ad62] hover:text-[#f0d99a]">{product.ctaLabel || "Learn more"} →</Link>
         ) : (
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="text-xs font-black uppercase tracking-wide text-[#d5ad62] hover:text-[#f0d99a]">Submit this deal →</a>
+          <Link href={`/submit-deal?product=${product.id}`} className="text-xs font-black uppercase tracking-wide text-[#d5ad62] hover:text-[#f0d99a]">Submit this deal →</Link>
         )}
       </div>
     </article>
@@ -39,7 +39,7 @@ export function PageHero({ eyebrow, title, copy, children }) {
         <h1 className="mt-5 max-w-5xl font-serif text-4xl leading-tight md:text-7xl">{title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/75 md:text-xl">{copy}</p>
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
+          <a href={JOTFORM_URL} className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
           {children}
         </div>
       </div>
@@ -76,7 +76,7 @@ export function ChecklistSection() {
           <Eyebrow>What to Send</Eyebrow>
           <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">A complete submission gets the fastest answer.</h2>
           <p className="mt-5 text-lg leading-8 text-white/70">Send what you have. If something is missing we will tell you exactly what we need before terms go out.</p>
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex bg-[#d5ad62] px-7 py-4 text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
+          <a href={JOTFORM_URL} className="mt-8 inline-flex bg-[#d5ad62] px-7 py-4 text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
         </div>
         <ul className="grid gap-px border border-white/10 bg-white/10">
           {dealChecklist.map((item) => <li key={item} className="flex gap-4 bg-[#0b0e0c] p-5 text-white/80"><span className="font-black text-[#d5ad62]">✓</span>{item}</li>)}
@@ -95,7 +95,7 @@ export function CtaBand({ title = "Have a deal that needs capital?", copy = "Sen
           <p className="mt-4 max-w-2xl text-white/70">{copy}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
+          <a href={JOTFORM_URL} className="bg-[#d5ad62] px-7 py-4 text-center text-sm font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">Submit a Deal</a>
           <a href="tel:7208174277" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">Call 720-817-4277</a>
         </div>
       </div>

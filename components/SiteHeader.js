@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { siteLinks } from "../lib/siteLinks";
 
-const JOTFORM_URL = siteLinks.jotformSubmitDeal;
+const JOTFORM_URL = siteLinks.submitDeal;
 
 const navItems = [
   { href: "/real-estate-funding", label: "Real Estate" },
@@ -30,7 +30,7 @@ export default function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">
+          <a href={JOTFORM_URL} className="bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">
             Submit Deal
           </a>
           <Link href="/investor-portal" className="px-2 py-3 text-xs font-black uppercase text-white/55 transition hover:text-[#d5ad62]">
@@ -46,7 +46,7 @@ export default function SiteHeader() {
       {open && (
         <nav className="grid gap-1 border-t border-white/10 bg-[#050605] px-5 py-5 text-sm font-black uppercase text-white/80 lg:hidden">
           {navItems.map((item) => <Link key={`${item.href}-${item.label}`} href={item.href} onClick={() => setOpen(false)} className="py-3 transition hover:text-[#d5ad62]">{item.label}</Link>)}
-          <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
+          <a href={JOTFORM_URL} onClick={() => setOpen(false)} className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
             Submit Deal
           </a>
           <Link href="/investor-portal" onClick={() => setOpen(false)} className="px-5 py-4 text-center text-white/55">
