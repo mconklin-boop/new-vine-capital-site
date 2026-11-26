@@ -6,7 +6,7 @@ const sections = [
     "Information We Collect",
     [
       "Contact and profile information you provide, such as name, email address, phone number, entity name, investor profile details, and relationship source.",
-      "Deal submission, investor inquiry, and portal information submitted through New Vine Capital forms, JotForm, HubSpot, or the investor portal.",
+      "Deal submission, investor inquiry, and portal information submitted through New Vine Capital forms, JotForm, or the investor portal.",
       "Portal activity information, such as login activity, document access, commitment submissions, and account settings updates.",
       "Connected bank account information when you choose to connect an account through Plaid, including institution name, account name, account type, account subtype, last four digits, connection status, and related identifiers needed to maintain the connection.",
     ],

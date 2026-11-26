@@ -67,6 +67,7 @@ function SubmissionCard({ item, onSaved }) {
           <p className="mt-1 text-sm text-white/60">
             <a href={`mailto:${item.contact_email}`} className="hover:text-[#d5ad62]">{item.contact_email}</a> · <a href={`tel:${item.contact_phone}`} className="hover:text-[#d5ad62]">{item.contact_phone}</a>
             {item.submitter_role ? ` · ${item.submitter_role}` : ""}
+            {item.contact_id ? <> · <a href={`/investor-portal/admin-contacts/${item.contact_id}`} className="font-black text-[#d5ad62] hover:underline">Open contact</a></> : null}
           </p>
           {location && <p className="mt-1 text-sm text-white/60">{location}</p>}
         </div>

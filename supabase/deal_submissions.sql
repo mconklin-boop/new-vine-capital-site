@@ -39,7 +39,7 @@ create table if not exists public.deal_submissions (
   admin_notes text,
 
   -- Integrations
-  hubspot_contact_id text,
+  contact_id uuid,
   notification_sent_at timestamptz,
   confirmation_sent_at timestamptz,
   integration_errors jsonb not null default '[]'::jsonb,

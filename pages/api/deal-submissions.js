@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from "../../lib/supabaseAdmin";
-import { num, PRODUCTS, screenDeal } from "../../lib/underwriting";
+import { contactTypeForDeal, logActivity, upsertContact } from "../../lib/crm";
+import { BUSINESS_PRODUCTS, num, PRODUCTS, screenDeal } from "../../lib/underwriting";
 
 export const config = { api: { bodyParser: { sizeLimit: "64kb" } } };
 
@@ -69,38 +70,6 @@ function internalEmailText(lead, screen, id, origin) {
     "Internal preliminary screen only. Not an approval and not shared with the borrower.",
   ];
   return lines.filter((line) => line !== null).join("\n");
-}
-
-async function upsertHubSpotLead(lead) {
-  const token = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
-  if (!token) return null;
-  const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-  const search = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: "email", operator: "EQ", value: lead.contactEmail }] }], limit: 1 }),
-  });
-  if (!search.ok) throw new Error(`HubSpot search failed: ${await search.text()}`);
-  const found = (await search.json()).results?.[0];
-  if (found) return found.id;
-
-  const [firstname, ...rest] = lead.contactName.split(" ");
-  const create = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      properties: {
-        email: lead.contactEmail,
-        firstname: firstname || lead.contactName,
-        lastname: rest.join(" "),
-        phone: lead.contactPhone,
-        company: lead.companyName || lead.businessName || "",
-        lifecyclestage: "lead",
-      },
-    }),
-  });
-  if (!create.ok) throw new Error(`HubSpot contact failed: ${await create.text()}`);
-  return (await create.json()).id;
 }
 
 export default async function handler(req, res) {
@@ -195,10 +164,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const hubspotId = await upsertHubSpotLead(lead);
-    if (hubspotId) update.hubspot_contact_id = String(hubspotId);
+    const contactId = await upsertContact(supabase, {
+      email: lead.contactEmail,
+      name: lead.contactName,
+      phone: lead.contactPhone,
+      company: lead.companyName || lead.businessName,
+      contactType: contactTypeForDeal(lead, BUSINESS_PRODUCTS.includes(lead.product)),
+      source: lead.referralSource ? `Deal submission (${lead.referralSource})` : "Deal submission",
+    });
+    update.contact_id = contactId;
+    await logActivity(supabase, {
+      contactId,
+      type: "deal_submitted",
+      summary: `Submitted ${screen.productLabel} deal: ${screen.decision} (${screen.score}/100)`,
+      body: lead.propertyAddress || lead.businessName || null,
+      metadata: { dealSubmissionId: id, product: lead.product, decision: screen.decision, loanAmount: num(lead.loanAmount) },
+      createdBy: "system",
+    });
   } catch (error) {
-    integrationErrors.push({ key: "hubspot", message: error.message });
+    integrationErrors.push({ key: "crm", message: error.message });
   }
 
   update.integration_errors = integrationErrors;

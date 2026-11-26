@@ -28,7 +28,7 @@ export async function getServerSideProps(context) {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("investor_call_requests")
-    .select("id, name, email, phone, entity_name, requested_slot, requested_start, status, google_event_id, hubspot_contact_id, hubspot_meeting_id, integration_errors, email_sent_at, created_at, updated_at")
+    .select("id, name, email, phone, entity_name, requested_slot, requested_start, status, google_event_id, contact_id, integration_errors, email_sent_at, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -38,7 +38,7 @@ export async function getServerSideProps(context) {
 export default function AdminCallRequests({ user, requests = [], loadError = "" }) {
   const summary = [
     ["Total Requests", requests.length],
-    ["Integrated", requests.filter((item) => item.status === "Integrated").length],
+    ["Requested", requests.filter((item) => ["Requested", "Integrated"].includes(item.status)).length],
     ["Needs Review", requests.filter((item) => item.status === "Integration Review Needed").length],
     ["Email Sent", requests.filter((item) => item.email_sent_at).length],
   ];
@@ -58,7 +58,7 @@ export default function AdminCallRequests({ user, requests = [], loadError = "" 
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h3 className="text-2xl font-black">{request.name}</h3>
-                  <span className={`px-3 py-1 text-xs font-black uppercase ${request.status === "Integrated" ? "bg-[#1f5b3f] text-white" : "bg-[#8a5b16]/20 text-[#f0d99a]"}`}>{request.status}</span>
+                  <span className={`px-3 py-1 text-xs font-black uppercase ${["Requested", "Integrated"].includes(request.status) ? "bg-[#1f5b3f] text-white" : "bg-[#8a5b16]/20 text-[#f0d99a]"}`}>{request.status}</span>
                 </div>
                 <p className="mt-3 text-sm text-white/60">{request.email} / {request.phone}</p>
                 <p className="mt-1 text-sm text-white/60">Entity: {request.entity_name || "Not provided"}</p>
@@ -69,8 +69,7 @@ export default function AdminCallRequests({ user, requests = [], loadError = "" 
               <div className="grid gap-3 text-sm">
                 <div className="grid grid-cols-[160px_1fr] gap-2 border border-white/10 bg-white/5 p-3"><span className="font-black text-[#d5ad62]">Email</span><span>{request.email_sent_at ? `Sent ${formatDate(request.email_sent_at)}` : "Not sent"}</span></div>
                 <div className="grid grid-cols-[160px_1fr] gap-2 border border-white/10 bg-white/5 p-3"><span className="font-black text-[#d5ad62]">Google Event</span><span className="break-words">{request.google_event_id || "Not created"}</span></div>
-                <div className="grid grid-cols-[160px_1fr] gap-2 border border-white/10 bg-white/5 p-3"><span className="font-black text-[#d5ad62]">HubSpot Contact</span><span className="break-words">{request.hubspot_contact_id || "Not created"}</span></div>
-                <div className="grid grid-cols-[160px_1fr] gap-2 border border-white/10 bg-white/5 p-3"><span className="font-black text-[#d5ad62]">HubSpot Meeting</span><span className="break-words">{request.hubspot_meeting_id || "Not created"}</span></div>
+                <div className="grid grid-cols-[160px_1fr] gap-2 border border-white/10 bg-white/5 p-3"><span className="font-black text-[#d5ad62]">Contact</span><span>{request.contact_id ? <a href={`/investor-portal/admin-contacts/${request.contact_id}`} className="text-[#d5ad62] underline">Open contact</a> : "Not linked"}</span></div>
               </div>
             </div>
 

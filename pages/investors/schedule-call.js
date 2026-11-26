@@ -1,15 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "../../components/SiteHeader";
 import SiteFooter from "../../components/SiteFooter";
 import { siteLinks } from "../../lib/siteLinks";
-
-const availableSlots = [
-  { date: "Tuesday, June 2", times: ["9:30 AM", "11:00 AM", "2:00 PM"] },
-  { date: "Wednesday, June 3", times: ["10:00 AM", "1:30 PM", "3:30 PM"] },
-  { date: "Thursday, June 4", times: ["9:00 AM", "12:30 PM", "4:00 PM"] },
-  { date: "Friday, June 5", times: ["10:30 AM", "1:00 PM"] },
-];
 
 const callTopics = [
   "Investor qualification and suitability review",
@@ -23,11 +16,23 @@ export default function InvestorScheduler() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [availableSlots, setAvailableSlots] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/investor-call-requests")
+      .then((response) => response.json())
+      .then((data) => setAvailableSlots(data.days || []))
+      .catch(() => setAvailableSlots([]));
+  }, []);
 
   const selectedSlotLabel = useMemo(() => {
-    if (!selectedSlot) return "No time selected";
-    return selectedSlot.replace("|", " at ");
-  }, [selectedSlot]);
+    if (!selectedSlot || !availableSlots) return "No time selected";
+    for (const day of availableSlots) {
+      const slot = day.slots.find((item) => item.start === selectedSlot);
+      if (slot) return `${day.label} at ${slot.label} MT`;
+    }
+    return selectedSlot;
+  }, [selectedSlot, availableSlots]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -76,7 +81,7 @@ export default function InvestorScheduler() {
               <>
                 <div className="flex flex-col gap-2 border-b border-black/10 pb-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#1f5b3f]">Available Times</p><h2 className="mt-2 text-3xl font-black">Select a preferred call time.</h2></div><p className="text-sm font-bold text-[#53615a]">Mountain Time</p></div>
 
-                <div className="mt-6 grid gap-5">{availableSlots.map((day) => <fieldset key={day.date} className="border border-black/10 p-4"><legend className="px-2 text-sm font-black text-[#1f5b3f]">{day.date}</legend><div className="mt-3 grid gap-2 sm:grid-cols-3">{day.times.map((time) => { const value = `${day.date}|${time}`; const isSelected = selectedSlot === value; return <label key={value} className={`cursor-pointer border px-4 py-3 text-center text-sm font-black transition ${isSelected ? "border-[#1f5b3f] bg-[#1f5b3f] text-white" : "border-black/10 bg-[#f4f1e9] text-[#050605] hover:border-[#d5ad62]"}`}><input type="radio" name="slot" value={value} checked={isSelected} onChange={() => setSelectedSlot(value)} className="sr-only" />{time}</label>; })}</div></fieldset>)}</div>
+                <div className="mt-6 grid max-h-[560px] gap-5 overflow-y-auto pr-1">{availableSlots === null && <p className="text-sm font-bold text-[#53615a]">Loading available times...</p>}{availableSlots && availableSlots.length === 0 && <p className="text-sm font-bold text-[#53615a]">No times are open right now. Email mike@newvinecapital.com and we will find a time.</p>}{(availableSlots || []).map((day) => <fieldset key={day.date} className="border border-black/10 p-4"><legend className="px-2 text-sm font-black text-[#1f5b3f]">{day.label}</legend><div className="mt-3 grid gap-2 sm:grid-cols-3">{day.slots.map((slot) => { const isSelected = selectedSlot === slot.start; return <label key={slot.start} className={`cursor-pointer border px-4 py-3 text-center text-sm font-black transition ${isSelected ? "border-[#1f5b3f] bg-[#1f5b3f] text-white" : "border-black/10 bg-[#f4f1e9] text-[#050605] hover:border-[#d5ad62]"}`}><input type="radio" name="slot" value={slot.start} checked={isSelected} onChange={() => setSelectedSlot(slot.start)} className="sr-only" />{slot.label}</label>; })}</div></fieldset>)}</div>
 
                 <div className="mt-7 grid gap-4 md:grid-cols-2"><label className="grid gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#53615a]">Name<input required name="name" className="border border-black/10 bg-[#f4f1e9] px-4 py-3 text-base font-semibold normal-case tracking-normal text-[#050605] outline-none focus:border-[#1f5b3f]" /></label><label className="grid gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#53615a]">Email<input required type="email" name="email" className="border border-black/10 bg-[#f4f1e9] px-4 py-3 text-base font-semibold normal-case tracking-normal text-[#050605] outline-none focus:border-[#1f5b3f]" /></label><label className="grid gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#53615a]">Phone<input required name="phone" className="border border-black/10 bg-[#f4f1e9] px-4 py-3 text-base font-semibold normal-case tracking-normal text-[#050605] outline-none focus:border-[#1f5b3f]" /></label><label className="grid gap-2 text-sm font-black uppercase tracking-[0.12em] text-[#53615a]">Entity Name<input name="entity" className="border border-black/10 bg-[#f4f1e9] px-4 py-3 text-base font-semibold normal-case tracking-normal text-[#050605] outline-none focus:border-[#1f5b3f]" /></label></div>
 

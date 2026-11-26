@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import { getSupabaseAdmin } from "../../lib/supabaseAdmin";
+import { logActivity, upsertContact } from "../../lib/crm";
+import { addMinutes, buildAvailability, CALL_MINUTES, isBookable, labelForSlot, TIME_ZONE } from "../../lib/scheduling";
 
-const TIME_ZONE = "America/Denver";
-const DEFAULT_DURATION_MINUTES = 30;
 
 function requireEnv(name) {
   const value = process.env[name];
@@ -27,30 +27,22 @@ function signJwt({ clientEmail, privateKey }) {
   return `${unsignedToken}.${signature}`;
 }
 
-function parseSlot(slot) {
-  const [dateLabel, timeLabel] = String(slot || "").split("|");
-  const year = process.env.INVESTOR_SCHEDULER_YEAR || "2026";
-  const cleanDate = dateLabel?.replace(/^[A-Za-z]+,\s*/, "");
-  const parsed = new Date(`${cleanDate} ${year} ${timeLabel}`);
-  if (!dateLabel || !timeLabel || Number.isNaN(parsed.getTime())) return null;
+function parseSlot(start) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(start || "")) return null;
+  const end = addMinutes(start, CALL_MINUTES);
+  return { startLocal: `${start}:00`, endLocal: `${end}:00`, display: labelForSlot(start).display };
+}
 
-  const month = String(parsed.getMonth() + 1).padStart(2, "0");
-  const day = String(parsed.getDate()).padStart(2, "0");
-  const hours = String(parsed.getHours()).padStart(2, "0");
-  const minutes = String(parsed.getMinutes()).padStart(2, "0");
-  const startLocal = `${year}-${month}-${day}T${hours}:${minutes}:00`;
-  const end = new Date(parsed.getTime() + DEFAULT_DURATION_MINUTES * 60 * 1000);
-  const endHours = String(end.getHours()).padStart(2, "0");
-  const endMinutes = String(end.getMinutes()).padStart(2, "0");
-  const endLocal = `${year}-${month}-${day}T${endHours}:${endMinutes}:00`;
-
-  return { dateLabel, timeLabel, startLocal, endLocal, display: `${dateLabel} at ${timeLabel}` };
+async function bookedStarts(supabase) {
+  const { data, error } = await supabase.from("investor_call_requests").select("requested_start, status").not("status", "in", "(Cancelled,Canceled)");
+  if (error) throw error;
+  return (data || []).map((row) => row.requested_start);
 }
 
 async function sendNotificationEmail(payload, slotDetails) {
   const apiKey = requireEnv("RESEND_API_KEY");
-  const notificationEmail = requireEnv("SCHEDULER_NOTIFICATION_EMAIL");
-  const fromEmail = process.env.SCHEDULER_FROM_EMAIL || "New Vine Capital <onboarding@resend.dev>";
+  const notificationEmail = process.env.SCHEDULER_NOTIFICATION_EMAIL || process.env.COMMITMENT_NOTIFICATION_EMAIL || "mike@newvinecapital.com";
+  const fromEmail = process.env.SCHEDULER_FROM_EMAIL || process.env.EMAIL_FROM || "New Vine Capital <onboarding@resend.dev>";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -104,70 +96,17 @@ async function createGoogleCalendarEvent(payload, slotDetails) {
   return eventResponse.json();
 }
 
-async function searchHubSpotContactByEmail(token, email) {
-  const response = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      filterGroups: [{ filters: [{ propertyName: "email", operator: "EQ", value: email }] }],
-      properties: ["email", "firstname", "lastname", "phone", "company"],
-      limit: 1,
-    }),
-  });
-  if (!response.ok) throw new Error(`HubSpot contact search failed: ${await response.text()}`);
-  const data = await response.json();
-  return data.results?.[0] || null;
-}
-
-async function upsertHubSpotContact(payload) {
-  const token = requireEnv("HUBSPOT_PRIVATE_APP_TOKEN");
-  const existing = await searchHubSpotContactByEmail(token, payload.email);
-  if (existing) return existing;
-
-  const contactResponse = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      properties: {
-        email: payload.email,
-        firstname: payload.name.split(" ")[0] || payload.name,
-        lastname: payload.name.split(" ").slice(1).join(" ") || "",
-        phone: payload.phone,
-        company: payload.entity || "",
-      },
-    }),
-  });
-
-  if (contactResponse.status === 409) {
-    const duplicate = await searchHubSpotContactByEmail(token, payload.email);
-    if (duplicate) return duplicate;
-  }
-  if (!contactResponse.ok) throw new Error(`HubSpot contact failed: ${await contactResponse.text()}`);
-  return contactResponse.json();
-}
-
-async function createHubSpotMeeting(payload, slotDetails, contactId) {
-  const token = requireEnv("HUBSPOT_PRIVATE_APP_TOKEN");
-  const timestamp = new Date(`${slotDetails.startLocal}-06:00`).toISOString();
-  const response = await fetch("https://api.hubapi.com/crm/v3/objects/meetings", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      properties: {
-        hs_timestamp: timestamp,
-        hs_meeting_title: `Investor Intake Call - ${payload.name}`,
-        hs_meeting_body: `Requested time: ${slotDetails.display}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nEntity: ${payload.entity || "N/A"}\nNotes: ${payload.notes || "N/A"}`,
-        hs_meeting_outcome: "SCHEDULED",
-      },
-      associations: contactId ? [{ to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 200 }] }] : [],
-    }),
-  });
-
-  if (!response.ok) throw new Error(`HubSpot meeting failed: ${await response.text()}`);
-  return response.json();
-}
-
 export default async function handler(req, res) {
+  if (req.method === "GET") {
+    try {
+      const booked = await bookedStarts(getSupabaseAdmin());
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(200).json({ timeZone: TIME_ZONE, days: buildAvailability({ booked }) });
+    } catch (error) {
+      console.error("Availability lookup failed", error);
+      return res.status(200).json({ timeZone: TIME_ZONE, days: buildAvailability() });
+    }
+  }
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const payload = {
@@ -190,13 +129,20 @@ export default async function handler(req, res) {
   const supabase = getSupabaseAdmin();
 
   try {
+    const booked = await bookedStarts(supabase);
+    if (!isBookable(payload.slot, { booked })) return res.status(409).json({ error: "That time is no longer available. Please pick another time." });
+  } catch (error) {
+    console.error("Availability check failed", error);
+  }
+
+  try {
     const { data, error } = await supabase.from("investor_call_requests").insert({
       name: payload.name,
       email: payload.email,
       phone: payload.phone,
       entity_name: payload.entity || null,
       notes: payload.notes || null,
-      requested_slot: payload.slot,
+      requested_slot: slotDetails.display,
       requested_start: slotDetails.startLocal,
       requested_end: slotDetails.endLocal,
       timezone: TIME_ZONE,
@@ -218,33 +164,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    integrationResults.googleCalendar = await createGoogleCalendarEvent(payload, slotDetails);
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL) integrationResults.googleCalendar = await createGoogleCalendarEvent(payload, slotDetails);
   } catch (error) {
     console.error("Investor scheduler Google Calendar integration failed", error);
     integrationErrors.push({ key: "googleCalendar", message: error.message });
   }
 
   try {
-    integrationResults.hubspotContact = await upsertHubSpotContact(payload);
+    integrationResults.contactId = await upsertContact(supabase, {
+      email: payload.email, name: payload.name, phone: payload.phone, company: payload.entity, contactType: "Investor", source: "Investor call request",
+    });
+    await logActivity(supabase, {
+      contactId: integrationResults.contactId,
+      type: "call_requested",
+      summary: `Requested investor intake call: ${slotDetails.display}`,
+      body: payload.notes || null,
+      metadata: { callRequestId: requestId, start: slotDetails.startLocal },
+      createdBy: "system",
+    });
+    await supabase.from("crm_contacts").update({ next_follow_up: slotDetails.startLocal.slice(0, 10), follow_up_note: "Investor intake call" }).eq("id", integrationResults.contactId);
   } catch (error) {
-    console.error("Investor scheduler HubSpot contact integration failed", error);
-    integrationErrors.push({ key: "hubspotContact", message: error.message });
-  }
-
-  try {
-    integrationResults.hubspotMeeting = await createHubSpotMeeting(payload, slotDetails, integrationResults.hubspotContact?.id);
-  } catch (error) {
-    console.error("Investor scheduler HubSpot meeting integration failed", error);
-    integrationErrors.push({ key: "hubspotMeeting", message: error.message });
+    console.error("Investor scheduler CRM update failed", error);
+    integrationErrors.push({ key: "crm", message: error.message });
   }
 
   const updatePayload = {
     google_event_id: integrationResults.googleCalendar?.id || null,
-    hubspot_contact_id: integrationResults.hubspotContact?.id || null,
-    hubspot_meeting_id: integrationResults.hubspotMeeting?.id || null,
+    contact_id: integrationResults.contactId || null,
     email_sent_at: integrationResults.email?.id ? new Date().toISOString() : null,
     integration_errors: integrationErrors,
-    status: integrationErrors.length ? "Integration Review Needed" : "Integrated",
+    status: integrationErrors.length ? "Integration Review Needed" : "Requested",
     updated_at: new Date().toISOString(),
   };
 
@@ -258,8 +207,6 @@ export default async function handler(req, res) {
       saved: Boolean(integrationResults.supabaseId),
       emailSent: Boolean(integrationResults.email?.id),
       googleCalendarCreated: Boolean(integrationResults.googleCalendar?.id),
-      hubspotContactId: integrationResults.hubspotContact?.id || null,
-      hubspotMeetingId: integrationResults.hubspotMeeting?.id || null,
     },
     integrationErrors,
   });
