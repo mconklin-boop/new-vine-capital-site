@@ -6,8 +6,8 @@ import { siteLinks } from "../lib/siteLinks";
 const JOTFORM_URL = siteLinks.jotformSubmitDeal;
 
 const navItems = [
-  { href: "/", label: "Borrowers" },
-  { href: "/investors", label: "Investors" },
+  { href: "/real-estate-funding", label: "Real Estate" },
+  { href: "/business-financing", label: "Business" },
   { href: "/funding-process", label: "Process" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -33,8 +33,8 @@ export default function SiteHeader() {
           <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" className="bg-[#d5ad62] px-5 py-3 text-xs font-black uppercase text-[#11100b] transition hover:bg-[#f0d99a]">
             Submit Deal
           </a>
-          <Link href="/investor-portal" className="border border-[#d5ad62]/60 px-5 py-3 text-xs font-black uppercase text-[#d5ad62] transition hover:bg-[#d5ad62] hover:text-[#11100b]">
-            Investor Portal Login
+          <Link href="/investor-portal" className="px-2 py-3 text-xs font-black uppercase text-white/55 transition hover:text-[#d5ad62]">
+            Investor Login
           </Link>
         </div>
 
@@ -49,8 +49,8 @@ export default function SiteHeader() {
           <a href={JOTFORM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className="mt-3 bg-[#d5ad62] px-5 py-4 text-center text-[#11100b]">
             Submit Deal
           </a>
-          <Link href="/investor-portal" onClick={() => setOpen(false)} className="border border-[#d5ad62]/60 px-5 py-4 text-center text-[#d5ad62]">
-            Investor Portal Login
+          <Link href="/investor-portal" onClick={() => setOpen(false)} className="px-5 py-4 text-center text-white/55">
+            Investor Login
           </Link>
         </nav>
       )}

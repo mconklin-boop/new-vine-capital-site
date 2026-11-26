@@ -1,221 +1,67 @@
-import Link from "next/link";
+import Head from "next/head";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
+import { CtaBand, Eyebrow, PageHero, ProductCard } from "../components/ProductSections";
+import { businessProducts } from "../lib/products";
+
+const fit = [
+  ["Business purpose", "Financing for operating businesses, not personal or household use."],
+  ["Established operations", "Time in business, revenue and credit profile drive what is available."],
+  ["Clear use of funds", "Equipment, working capital, fuel or growth, with a plan for repayment."],
+];
 
 export default function BusinessFinancing() {
-  const products = [
-    {
-      title: "Fuel Accounts",
-      description:
-        "Structured fuel purchasing solutions for trucking companies, fleets, and operators who need reliable access to fuel and better cash flow management.",
-      href: "/business-financing/fuel-cards",
-      cta: "Explore Fuel Accounts",
-    },
-    {
-      title: "Business Lines of Credit",
-      description:
-        "Flexible access to capital for operating expenses, growth opportunities, and short-term business cash flow needs.",
-      href: "#contact-section",
-      cta: "Contact Us",
-    },
-    {
-      title: "Equipment Leasing",
-      description:
-        "Financing solutions for equipment purchases without large upfront capital requirements, designed to support operational growth.",
-      href: "#contact-section",
-      cta: "Contact Us",
-    },
-    {
-      title: "Credit Stacking",
-      description:
-        "Access multiple unsecured business credit lines using a strategic stacking approach. Designed to help business owners secure significant capital without collateral.",
-      href: "/business-financing/credit-stacking",
-      cta: "Explore Credit Stacking",
-    },
-    {
-      title: "More Products Coming",
-      description:
-        "New Vine Capital is actively expanding its business financing solutions to better serve business owners, operators, and growing companies.",
-      href: "#contact-section",
-      cta: "Stay Connected",
-    },
-  ];
+  const products = businessProducts.map((product) => (
+    product.href ? { ...product, ctaLabel: `Explore ${product.title}` } : { ...product, href: "#contact-section", ctaLabel: "Ask about this" }
+  ));
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#f4ead2]">
+    <div className="min-h-screen bg-[#050605] text-white">
+      <Head>
+        <title>Business Financing | New Vine Capital</title>
+        <meta name="description" content="Equipment financing, business lines of credit, fuel accounts and credit stacking for business owners, carriers and fleets." />
+      </Head>
       <SiteHeader />
+      <main>
+        <PageHero
+          eyebrow="Business Financing"
+          title="Capital to run, equip and grow your business."
+          copy="Equipment, working capital, fuel accounts and unsecured credit for owners and operators, with direct communication from first call to funding."
+        >
+          <a href="tel:7208174277" className="border border-white/35 px-7 py-4 text-center text-sm font-black uppercase text-white transition hover:border-[#d5ad62]">Call 720-817-4277</a>
+        </PageHero>
 
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(215,187,116,0.15),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(83,101,68,0.15),transparent_30%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
-          <div className="max-w-3xl">
-            <div className="inline-flex rounded-full border border-[#8c6a2d]/40 bg-[#1b160d] px-4 py-2 text-sm text-[#d7bb74]">
-              Business Financing Solutions
-            </div>
-
-            <h1 className="mt-6 text-4xl font-semibold leading-tight text-[#f8f1de] md:text-6xl">
-              Flexible business financing for operators, owners, and growing companies.
-            </h1>
-
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#c5bea9]">
-              New Vine Capital provides business-purpose financing solutions designed
-              to support cash flow, operations, and growth. Our focus is practical
-              capital, direct communication, and flexible execution.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/business-financing/fuel-cards"
-                className="rounded-2xl bg-[#d7bb74] px-6 py-4 text-center text-sm font-semibold text-[#16120a] shadow-lg shadow-[#d7bb74]/20 transition hover:-translate-y-0.5 hover:bg-[#e5ca86]"
-              >
-                Explore Fuel Accounts
-              </Link>
-              <a
-                href="tel:7208174277"
-                className="rounded-2xl border border-[#8c6a2d]/35 bg-[#0f120d]/80 px-6 py-4 text-center text-sm font-semibold text-[#f4ead2] transition hover:bg-[#172015]"
-              >
-                Call 720-817-4277
-              </a>
-            </div>
+        <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <Eyebrow>Programs</Eyebrow>
+          <h2 className="mt-4 max-w-3xl font-serif text-4xl leading-tight md:text-5xl">Business programs.</h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {products.map((product) => <ProductCard key={product.id} product={product} detailed />)}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <div className="max-w-2xl">
-          <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">
-            Financing Products
-          </div>
-          <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de] md:text-4xl">
-            Business-purpose capital solutions designed to support operations and growth.
-          </h2>
-          <p className="mt-4 text-[#c5bea9]">
-            We highlight practical financing products for operators who need reliable
-            capital access, with more solutions being added over time.
-          </p>
-        </div>
-
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <div
-              key={product.title}
-              className="rounded-2xl border border-[#8c6a2d]/20 bg-[#0d0d0b] p-6 transition hover:bg-[#151510]"
-            >
-              <h3 className="text-lg font-semibold text-[#f4ead2]">
-                {product.title}
-              </h3>
-              <p className="mt-3 leading-7 text-[#c5bea9]">
-                {product.description}
-              </p>
-
-              {product.href.startsWith("/") ? (
-                <Link
-                  href={product.href}
-                  className="mt-6 inline-flex rounded-xl border border-[#8c6a2d]/30 bg-[#1a2117] px-4 py-3 text-sm font-semibold text-[#d7bb74] transition hover:bg-[#232d1f]"
-                >
-                  {product.cta}
-                </Link>
-              ) : (
-                <a
-                  href={product.href}
-                  className="mt-6 inline-flex rounded-xl border border-[#8c6a2d]/30 bg-[#1a2117] px-4 py-3 text-sm font-semibold text-[#d7bb74] transition hover:bg-[#232d1f]"
-                >
-                  {product.cta}
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-[#8c6a2d]/15 bg-[#0a0a08]">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#10100d] p-8">
-              <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">
-                Current Highlight
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">
-                Fuel accounts for fleet and transportation operators.
-              </h2>
-              <p className="mt-4 leading-8 text-[#c5bea9]">
-                Our current featured business financing product is Fuel Accounts,
-                designed for trucking companies, fleet-based businesses, and operators
-                who need consistent access to fuel purchasing solutions.
-              </p>
-              <Link
-                href="/business-financing/fuel-cards"
-                className="mt-6 inline-flex rounded-2xl bg-[#d7bb74] px-6 py-4 text-sm font-semibold text-[#16120a] transition hover:bg-[#e5ca86]"
-              >
-                Go to Fuel Accounts
-              </Link>
-            </div>
-
-            <div
-              id="contact-section"
-              className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#10100d] p-8"
-            >
-              <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">
-                Contact
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">
-                Ask about other business financing solutions.
-              </h2>
-              <p className="mt-4 leading-8 text-[#c5bea9]">
-                For business lines of credit, equipment leasing, credit stacking,
-                and upcoming products, contact New Vine Capital directly to discuss
-                your funding needs.
-              </p>
-
-              <div className="mt-8 space-y-4 text-[#c5bea9]">
-                <div>
-                  <span className="font-semibold text-[#f4ead2]">Email:</span>{" "}
-                  deals@newvinecapital.com
-                </div>
-                <div>
-                  <span className="font-semibold text-[#f4ead2]">Phone:</span>{" "}
-                  720-817-4277
-                </div>
-                <div>
-                  <span className="font-semibold text-[#f4ead2]">Address:</span>{" "}
-                  1500 N Grant St #7339, Denver, CO 80203
-                </div>
+        <section className="border-y border-white/10 bg-[#0b0e0c] px-5 py-20 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.9fr]">
+            <div>
+              <Eyebrow>Good Fit</Eyebrow>
+              <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">What we look for.</h2>
+              <div className="mt-8 grid gap-4">
+                {fit.map(([title, copy]) => <article key={title} className="border-l-4 border-[#d5ad62] bg-[#111613] p-5"><h3 className="font-black">{title}</h3><p className="mt-2 text-sm leading-6 text-white/65">{copy}</p></article>)}
               </div>
             </div>
+            <aside id="contact-section" className="scroll-mt-32 self-start border border-[#d5ad62]/40 bg-[#111613] p-8">
+              <Eyebrow>Talk to Us</Eyebrow>
+              <h3 className="mt-4 text-2xl font-black">Tell us what you need the capital for.</h3>
+              <p className="mt-3 text-sm leading-6 text-white/65">Call or email with your business, time in business, approximate revenue and what the funds are for. We will tell you which program fits.</p>
+              <div className="mt-6 grid gap-3 text-sm">
+                <a href="tel:7208174277" className="font-black text-[#d5ad62] hover:text-[#f0d99a]">720-817-4277</a>
+                <a href="mailto:deals@newvinecapital.com" className="font-black text-[#d5ad62] hover:text-[#f0d99a]">deals@newvinecapital.com</a>
+              </div>
+            </aside>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <div className="rounded-[2rem] border border-[#8c6a2d]/20 bg-[#10100d] p-8 text-center shadow-2xl shadow-black/20">
-          <div className="text-sm uppercase tracking-[0.25em] text-[#d7bb74]">
-            Next Step
-          </div>
-          <h2 className="mt-3 text-3xl font-semibold text-[#f8f1de]">
-            Ready to get started?
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl leading-8 text-[#c5bea9]">
-            Explore our featured Fuel Account application, review Credit Stacking,
-            or contact New Vine Capital to discuss other business financing opportunities.
-          </p>
-
-          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-            <Link
-              href="/business-financing/fuel-cards"
-              className="rounded-2xl bg-[#d7bb74] px-8 py-4 text-sm font-semibold text-[#16120a] transition hover:bg-[#e5ca86]"
-            >
-              Explore Fuel Accounts
-            </Link>
-            <Link
-              href="/business-financing/credit-stacking"
-              className="rounded-2xl border border-[#8c6a2d]/35 bg-[#0f120d]/80 px-8 py-4 text-sm font-semibold text-[#f4ead2] transition hover:bg-[#172015]"
-            >
-              Explore Credit Stacking
-            </Link>
-          </div>
-        </div>
-      </section>
-
+        <CtaBand title="Ready to talk business financing?" copy="Call or email and we will point you to the right program, or submit a real estate deal through our form." />
+      </main>
       <SiteFooter />
     </div>
   );
